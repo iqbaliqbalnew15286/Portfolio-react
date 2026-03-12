@@ -1,12 +1,11 @@
-# Fix App.jsx Blank Screen - Progress Tracker
+# Task: Fix Spotify Now Playing on Mobile
 
-## Plan Steps:
+## Steps:
 
-- [x] 1. Create TODO.md (current)
-- [ ] 2. Fix imports/refs in src/App.jsx
-- [ ] 3. Remove constraining container from src/main.jsx
-- [ ] 4. Test http://localhost:5174
-- [ ] 5. Check browser console (F12) for errors
-- [ ] 6. Mark complete & attempt_completion
+- [x] Create TODO.md ✅
+- [x] Edit App.jsx - Make SpotifyNowPlaying visible on mobile (fixed bottom-right positioning) ✅
+- [x] Test with `npm run dev` ✅ (server running on http://localhost:5176)
+- [x] Verify mobile responsiveness (SpotifyNowPlaying now fixed bottom-right, visible all breakpoints) ✅
+- [x] Complete task ✅
 
-**Status:** Complete! App.jsx fully fixed with loading screen re-enabled and Spotify visible on mobile/tablet too.
+**DONE**
