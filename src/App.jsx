@@ -132,6 +132,28 @@ function App() {
     },
   ];
 
+
+  // State untuk Contact Form (WhatsApp / Email Toggle)
+  const [contactMethod, setContactMethod] = useState("email");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    interest: "Web Development",
+    message: ""
+  });
+
+  // Fungsi untuk mengirim pesan via WhatsApp
+  const handleWhatsAppSubmit = (e) => {
+    e.preventDefault();
+    const { name, interest, message } = formData;
+    
+    // Ganti nomor di bawah ini dengan nomor WhatsApp Anda (Gunakan format 62 di awal, contoh: 6281234567890)
+    const phoneNumber = "6281234567890"; 
+    
+    const text = `Halo Iqbal, nama saya *${name || "Seseorang"}*.\nSaya tertarik untuk berdiskusi tentang *${interest}*.\n\nPesan:\n${message || "-"}`;
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   // Logika tampilan berdasarkan state
   const displayedEducation = educationalPath; // Selalu tampil semua
   const displayedExperience = showAllTimeline
@@ -558,74 +580,292 @@ function App() {
           </motion.div>
         </section>
 
-        {/* --- 7. CONTACT SECTION --- */}
-        <section id="contact" className="py-32 relative overflow-hidden">
-          <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px ${isDarkTheme ? "bg-gradient-to-r from-transparent via-white/20 to-transparent" : "bg-gradient-to-r from-transparent via-black/20 to-transparent"}`}></div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className={`w-full max-w-5xl mx-auto rounded-[3rem] p-10 md:p-20 text-center border relative overflow-hidden shadow-2xl ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/10 backdrop-blur-2xl" : "bg-white/80 border-black/10 backdrop-blur-2xl"}`}>
-            <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className={`absolute -top-32 -left-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-blue-600/20" : "bg-blue-400/20"}`} />
-            <motion.div animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className={`absolute -bottom-32 -right-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-purple-600/20" : "bg-purple-400/20"}`} />
+       {/* ========================================= */}
+        {/* 7. CONTACT SECTION (Modern 2-Column Split)  */}
+        {/* ========================================= */}
+        <section id="contact" className={`py-32 relative overflow-hidden border-t ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
+          {/* Latar Belakang Dekoratif (Glow Halus) */}
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[150px] opacity-10 pointer-events-none bg-blue-500"></div>
 
-            <div className="relative z-10 flex flex-col items-center">
-              <motion.div variants={fadeUp} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase border mb-8 ${isDarkTheme ? "bg-white/5 border-white/10 text-white" : "bg-black/5 border-black/10 text-black"}`}>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                Status: Open to Work
+          <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
+              
+              {/* KOLOM KIRI: Teks & Info Kontak Cepat */}
+              <motion.div 
+                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
+                className="flex flex-col gap-8"
+              >
+                <div>
+                  <motion.div variants={fadeUp} className="flex items-center gap-4 mb-6">
+                    <span className={`w-8 h-px ${isDarkTheme ? "bg-white/30" : "bg-black/30"}`}></span>
+                    <span className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}>GET IN TOUCH</span>
+                  </motion.div>
+                  
+                  <motion.h2 variants={fadeUp} className="text-5xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6">
+                    Let's Start <br className="hidden md:block"/> Talking.
+                  </motion.h2>
+                  
+                  <motion.p variants={fadeUp} className={`text-base md:text-lg max-w-md leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                    Punya ide proyek yang menarik, mencari partner kolaborasi, atau sekadar ingin menyapa? Jangan ragu untuk menghubungi saya. <em className={isDarkTheme ? "text-white" : "text-black"}>*My inbox is always open.*</em>
+                  </motion.p>
+                </div>
+
+                {/* List Kontak Cepat dengan Efek Menyala saat Hover */}
+                <motion.div variants={fadeUp} className="flex flex-col gap-6 mt-4">
+                  
+                  {/* Email Box */}
+                  <div className={`group flex items-center gap-6 pb-6 border-b ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
+                    <div className={`w-14 h-14 shrink-0 rounded-full flex items-center justify-center border transition-all duration-300 ${isDarkTheme ? "bg-[#111] border-white/10 group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]" : "bg-white border-black/10 shadow-sm"}`}>
+                      <i className={`ri-mail-line text-xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 group-hover:text-white" : "text-zinc-500 group-hover:text-black"}`}></i>
+                    </div>
+                    <div>
+                      <p className={`text-[10px] font-bold tracking-widest uppercase mb-1 ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>DIRECT EMAIL</p>
+                      <a href="mailto:emailanda@gmail.com" className="text-lg font-bold tracking-wide hover:underline underline-offset-4">
+                        emailanda@gmail.com
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Lokasi Box */}
+                  <div className="group flex items-center gap-6">
+                    <div className={`w-14 h-14 shrink-0 rounded-full flex items-center justify-center border transition-all duration-300 ${isDarkTheme ? "bg-[#111] border-white/10 group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]" : "bg-white border-black/10 shadow-sm"}`}>
+                      <i className={`ri-map-pin-line text-xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 group-hover:text-white" : "text-zinc-500 group-hover:text-black"}`}></i>
+                    </div>
+                    <div>
+                      <p className={`text-[10px] font-bold tracking-widest uppercase mb-1 ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>CURRENT LOCATION</p>
+                      <p className="text-lg font-bold tracking-wide flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Bogor, Indonesia
+                      </p>
+                    </div>
+                  </div>
+
+                </motion.div>
               </motion.div>
-              <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
-                {t("contactTitle") || "Mari Berkolaborasi."}
-              </motion.h2>
-              <motion.p variants={fadeUp} className={`text-base md:text-lg mb-12 max-w-xl leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
-                Mari diskusikan proyek web Anda selanjutnya. Saya siap membantu mewujudkan ide kompleks menjadi aplikasi berkinerja tinggi.
-              </motion.p>
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                <motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="mailto:emailanda@gmail.com" className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold transition-all ${isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"}`}>
-                  Mulai Diskusi <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
-                </motion.a>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigator.clipboard.writeText("emailanda@gmail.com")} className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold border transition-all ${isDarkTheme ? "border-white/20 text-white hover:bg-white/10" : "border-black/20 text-black hover:bg-black/5"}`}>
-                  <i className="ri-file-copy-line text-lg group-hover:scale-110 transition-transform"></i> Copy Email
-                </motion.button>
+
+              {/* KOLOM KANAN: Formulir Interaktif / Kotak Pesan */}
+              <motion.div 
+                initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                <div className={`w-full p-8 md:p-10 rounded-[2.5rem] border shadow-2xl relative ${isDarkTheme ? "bg-[#0a0a0a] border-white/10" : "bg-white border-black/10"}`}>
+                  
+                  {/* Toggles Tipe Pesan (Logic ganti ke WA atau Email) */}
+                  <div className={`flex p-1.5 rounded-2xl mb-8 ${isDarkTheme ? "bg-[#111] border border-white/5" : "bg-zinc-100 border border-black/5"}`}>
+                    <button 
+                      onClick={() => setContactMethod("email")}
+                      className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "email" ? (isDarkTheme ? "bg-[#1f1f1f] text-white shadow-sm" : "bg-white text-black shadow-sm") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}
+                    >
+                      <i className="ri-mail-send-line mr-2"></i> Standard Email
+                    </button>
+                    <button 
+                      onClick={() => setContactMethod("wa")}
+                      className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "wa" ? (isDarkTheme ? "bg-[#1f1f1f] text-green-400 shadow-sm border border-green-500/20" : "bg-white text-green-600 shadow-sm border border-green-500/20") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}
+                    >
+                      <i className="ri-whatsapp-line mr-2"></i> WhatsApp
+                    </button>
+                  </div>
+
+                  {/* Form Input */}
+                  <form className="flex flex-col gap-6" onSubmit={contactMethod === "wa" ? handleWhatsAppSubmit : (e) => e.preventDefault()}>
+                    <div className="flex flex-col gap-2">
+                      <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>What's your name?</label>
+                      <input 
+                        type="text" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        placeholder="John Doe" 
+                        className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
+                      />
+                    </div>
+                    
+                    {/* Input Email hanya tampil jika mode Email dipilih */}
+                    <AnimatePresence>
+                      {contactMethod === "email" && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="flex flex-col gap-2 overflow-hidden">
+                          <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>Your email address</label>
+                          <input 
+                            type="email" 
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            placeholder="john@example.com" 
+                            className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="flex flex-col gap-2">
+                      <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>What are you interested in?</label>
+                      <div className="relative">
+                        <select 
+                          value={formData.interest}
+                          onChange={(e) => setFormData({...formData, interest: e.target.value})}
+                          className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium appearance-none cursor-pointer ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black"}`}
+                        >
+                          <option value="Web Development">Web Development</option>
+                          <option value="Game Development">Game Development</option>
+                          <option value="UI/UX Design">UI/UX Design</option>
+                          <option value="Cybersecurity">Cybersecurity</option>
+                          <option value="Just saying hi!">Just saying hi!</option>
+                        </select>
+                        <i className="ri-arrow-down-s-line absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500"></i>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>Message</label>
+                      <textarea 
+                        rows="3"
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                        placeholder="Tell me about your project, timeline, or just say hello..." 
+                        className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium resize-none ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
+                      ></textarea>
+                    </div>
+
+                    {/* Tombol Submit Berubah Warna Tergantung Mode (WA / Email) */}
+                    <motion.button 
+                      type="submit"
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      className={`w-full py-5 rounded-2xl font-black tracking-widest uppercase text-xs mt-2 flex justify-center items-center gap-2 transition-all duration-300 ${
+                        contactMethod === "wa" 
+                          ? "bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.2)]" 
+                          : (isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800")
+                      }`}
+                    >
+                      {contactMethod === "wa" ? "Send Message via WA" : "Send To Inbox"} 
+                      <i className={contactMethod === "wa" ? "ri-whatsapp-line text-lg" : "ri-send-plane-fill text-lg"}></i>
+                    </motion.button>
+                    
+                    {/* Hint kecil untuk WA */}
+                    <AnimatePresence>
+                      {contactMethod === "wa" && (
+                        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-[10px] text-center text-zinc-500 mt-[-10px]">
+                          *You will be redirected to WhatsApp to send the message.
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+
+                  </form>
+
+                </div>
               </motion.div>
-              <motion.div variants={fadeUp} className={`flex justify-center gap-8 mt-16 pt-8 border-t w-full max-w-md ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
-                {["github-fill", "linkedin-fill", "instagram-line", "twitter-x-line"].map((icon, i) => (
-                  <motion.a key={i} href="#" whileHover={{ y: -5, scale: 1.1 }} className={`text-2xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-400 hover:text-black"}`}>
-                    <i className={`ri-${icon}`}></i>
-                  </motion.a>
-                ))}
-              </motion.div>
+
             </div>
-          </motion.div>
+          </div>
         </section>
+        {/* ========================================= */}
 
       </div> 
       {/* <-- End of main container --> */}
 
-      {/* --- 8. FOOTER SECTION --- */}
-      <footer className={`py-8 md:py-10 border-t relative z-20 ${isDarkTheme ? "border-white/10 bg-black" : "border-black/10 bg-[#f5f5f5]"}`}>
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm ${isDarkTheme ? "bg-white text-black" : "bg-black text-white"}`}>
-              I
-            </div>
-            <span className="text-sm font-bold tracking-widest uppercase">IQBAL.</span>
+      {/* ========================================= */}
+      {/* 8. FOOTER SECTION (Mega Modern Layout)      */}
+      {/* ========================================= */}
+      <footer className={`relative z-20 pt-24 pb-8 md:pb-12 overflow-hidden ${isDarkTheme ? "bg-[#050505]" : "bg-zinc-100"}`}>
+        {/* Garis atas bergradasi */}
+        <div className={`absolute top-0 left-0 w-full h-px ${isDarkTheme ? "bg-gradient-to-r from-transparent via-white/20 to-transparent" : "bg-gradient-to-r from-transparent via-black/20 to-transparent"}`}></div>
+
+        <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-8 flex flex-col gap-20">
+          
+          {/* Top Part: Giant Text & CTA */}
+          <div className="relative flex flex-col items-center justify-center text-center py-10">
+            {/* Teks Raksasa Transparan di Belakang */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className={`text-[22vw] md:text-[18vw] font-black tracking-tighter leading-none select-none pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
+                isDarkTheme ? "text-white/[0.03]" : "text-black/[0.03]"
+              }`}
+            >
+              IQBAL.
+            </motion.h1>
+
+            {/* Tombol CTA di Depan */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="relative z-10 flex flex-col items-center gap-6"
+            >
+              <h3 className="text-3xl md:text-5xl font-black tracking-tight">Got a project?</h3>
+              <a 
+                href="mailto:emailanda@gmail.com" 
+                className={`group flex items-center gap-3 px-8 py-4 md:px-10 md:py-5 rounded-full font-bold tracking-widest uppercase text-xs shadow-2xl transition-all hover:scale-105 active:scale-95 ${
+                  isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
+                }`}
+              >
+                Let's Talk <i className="ri-arrow-right-up-line text-lg group-hover:rotate-45 transition-transform"></i>
+              </a>
+            </motion.div>
           </div>
-          <p className={`text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}>
-            &copy; {new Date().getFullYear()} • Dibuat dengan <i className="ri-heart-3-fill text-red-500 mx-0.5 text-xs"></i> & React
-          </p>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className={`group flex items-center gap-2 text-[10px] md:text-[11px] font-bold tracking-widest uppercase transition-colors ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black"}`}>
-            Kembali ke atas <i className="ri-arrow-up-line text-sm group-hover:-translate-y-1 transition-transform"></i>
-          </button>
+
+          {/* Garis Pemisah Tengah */}
+          <div className={`w-full h-px ${isDarkTheme ? "bg-white/10" : "bg-black/10"}`}></div>
+
+          {/* Bottom Part: Links, Time, & Back to Top */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4">
+            
+            {/* Kiri: Local Time & Location */}
+            <div className="flex flex-col items-center md:items-start gap-1.5 w-full md:w-1/3">
+              <div className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Bogor, Indonesia
+              </div>
+              <p className={`text-xs font-medium tracking-widest uppercase flex items-center gap-2 ${isDarkTheme ? "text-zinc-300" : "text-zinc-700"}`}>
+                <i className="ri-time-line"></i> {formatTime(currentTime)} WIB
+              </p>
+            </div>
+
+            {/* Tengah: Social Icons */}
+            <div className="flex items-center justify-center gap-3 w-full md:w-1/3">
+               {["github-fill", "linkedin-fill", "instagram-line"].map((icon, i) => (
+                  <a 
+                    key={i} 
+                    href="#" 
+                    className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all hover:-translate-y-1 ${
+                      isDarkTheme 
+                        ? "border-white/10 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/5" 
+                        : "border-black/10 text-zinc-500 hover:text-black hover:border-black/30 hover:bg-black/5"
+                    }`}
+                  >
+                    <i className={`ri-${icon} text-xl`}></i>
+                  </a>
+               ))}
+            </div>
+
+            {/* Kanan: Copyright & Back to Top */}
+            <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-1/3">
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
+                className={`group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase transition-colors ${
+                  isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"
+                }`}
+              >
+                Kembali ke Atas <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all group-hover:-translate-y-1 ${isDarkTheme ? "border-white/20 bg-white/10 text-white" : "border-black/20 bg-black/10 text-black"}`}><i className="ri-arrow-up-line text-xs"></i></div>
+              </button>
+              <p className={`text-[10px] font-medium tracking-widest uppercase ${isDarkTheme ? "text-zinc-600" : "text-zinc-400"}`}>
+                &copy; {new Date().getFullYear()} IQBAL. All Rights Reserved.
+              </p>
+            </div>
+
+          </div>
         </div>
       </footer>
 
       {/* --- 9. FLOATING COMPONENT (Spotify) --- */}
-      <div className="fixed bottom-8 right-8 z-[110] md:block">
+      <div className="fixed bottom-8 right-8 z-[110] hidden xl:block">
         <SpotifyNowPlaying />
       </div>
 
     </div>
   );
 }
+
+
+
 
 export default App;
