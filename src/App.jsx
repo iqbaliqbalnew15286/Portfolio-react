@@ -11,27 +11,52 @@ import SpotifyNowPlaying from "./components/SpotifyNowPlaying";
 import InfiniteMarquee from "./components/InfiniteMarquee";
 import EmojiReactions from "./components/EmojiReactions";
 
+// =========================================================================
+// KOMPONEN JAM DIGITAL (Dipisah agar tidak membuat LAG seluruh website tiap detik)
+// =========================================================================
+const LiveClock = ({ isDarkTheme }) => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = time
+    .toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+    .replace(".", ":");
+
+  return (
+    <p className={`text-xs font-medium tracking-widest uppercase flex items-center gap-2 ${isDarkTheme ? "text-zinc-300" : "text-zinc-700"}`}>
+      <i className="ri-time-line"></i> {formattedTime} WIB
+    </p>
+  );
+};
+
+
+// =========================================================================
+// KOMPONEN UTAMA (APP)
+// =========================================================================
 function App() {
-  // =========================================================================
-  // 1. SEMUA HOOKS (useState, useRef, useEffect) WAJIB DI ATAS EARLY RETURN
-  // =========================================================================
   const { t } = useLanguage();
   const { isDark } = useTheme();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
   
-  // State Timeline Experience (Untuk tombol Show More / Less)
+  // State Timeline Experience
   const [showAllTimeline, setShowAllTimeline] = useState(false);
   
   // Ref untuk fungsi panah geser Horizontal Carousel
   const carouselRef = useRef(null);
 
-  // Efek Update Waktu
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // State untuk Contact Form (WhatsApp / Email Toggle)
+  const [contactMethod, setContactMethod] = useState("email");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    interest: "Web Development",
+    message: "",
+  });
 
   // Efek Smooth Scroll Manual
   useEffect(() => {
@@ -54,21 +79,6 @@ function App() {
       );
   }, []);
 
-  // =========================================================================
-  // 2. FUNGSI & DATA (Format Time, Scroll Logic, Array Timeline)
-  // =========================================================================
-  const formatTime = (date) =>
-    date
-      .toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
-      .replace(".", ":");
-
-  const formatDate = (date) =>
-    date.toLocaleDateString("id-ID", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-    });
-
   // Fungsi untuk tombol panah proyek
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
@@ -77,27 +87,36 @@ function App() {
     }
   };
 
+  // Fungsi untuk mengirim pesan via WhatsApp
+  const handleWhatsAppSubmit = (e) => {
+    e.preventDefault();
+    const { name, interest, message } = formData;
+    const phoneNumber = "6281234567890"; // Ganti dengan nomor asli Anda
+    const text = `Halo Iqbal, nama saya *${name || "Seseorang"}*.\nSaya tertarik untuk berdiskusi tentang *${interest}*.\n\nPesan:\n${message || "-"}`;
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   const educationalPath = [
     {
       id: 3,
-      title: "Pengembangan Perangkat Lunak & Gim",
-      subtitle: "SMK Amaliah 1",
+      title: "SMK AMALIAH 1 CIAWI KABUPATEN BOGOR",
+      subtitle: "Sekolah Menengah Kejuruan",
       date: "2022 - Sekarang",
-      icon: "graduation-cap-fill",
+      logo: "/assets/educational/smk.png",
     },
     {
       id: 2,
-      title: "Sekolah Menengah Pertama",
-      subtitle: "SMP Negeri / Swasta",
+      title: "SMPN 1 CIAWI KABUPATEN BOGOR",
+      subtitle: "Sekolah Menengah Pertama",
       date: "2019 - 2022",
-      icon: "building-4-line",
+      logo: "/assets/educational/smp.png",
     },
     {
       id: 1,
-      title: "Sekolah Dasar",
-      subtitle: "SD Negeri / Swasta",
+      title: "SDN 1 CIAWI KABUPATEN BOGOR",
+      subtitle: "Sekolah Dasar",
       date: "2013 - 2019",
-      icon: "book-read-line",
+      logo: "/assets/educational/sd.jpg",
     },
   ];
 
@@ -132,67 +151,38 @@ function App() {
     },
   ];
 
-
-  // State untuk Contact Form (WhatsApp / Email Toggle)
-  const [contactMethod, setContactMethod] = useState("email");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    interest: "Web Development",
-    message: ""
-  });
-
-  // Fungsi untuk mengirim pesan via WhatsApp
-  const handleWhatsAppSubmit = (e) => {
-    e.preventDefault();
-    const { name, interest, message } = formData;
-    
-    // Ganti nomor di bawah ini dengan nomor WhatsApp Anda (Gunakan format 62 di awal, contoh: 6281234567890)
-    const phoneNumber = "6281234567890"; 
-    
-    const text = `Halo Iqbal, nama saya *${name || "Seseorang"}*.\nSaya tertarik untuk berdiskusi tentang *${interest}*.\n\nPesan:\n${message || "-"}`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  // Logika tampilan berdasarkan state
-  const displayedEducation = educationalPath; // Selalu tampil semua
+  const displayedEducation = educationalPath; 
   const displayedExperience = showAllTimeline
     ? professionalExperience
-    : professionalExperience.slice(0, 1); // Tampil 1 jika tertutup
+    : professionalExperience.slice(0, 1); 
 
   const isDarkTheme = isDark !== false;
 
-  // Variasi Animasi Framer Motion
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
+  
   const stagger = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
 
-  // =========================================================================
-  // 3. EARLY RETURN UNTUK LOADING (Setelah semua deklarasi Hook & Variabel)
-  // =========================================================================
+  // --- LOADING SCREEN ---
   if (isLoading) {
     return <LoadingScreen onComplete={() => setIsLoading(false)} />;
   }
 
-  // =========================================================================
-  // 4. RENDER UI UTAMA (JSX)
-  // =========================================================================
   return (
     <div className={`min-h-screen w-full transition-colors duration-500 overflow-hidden relative selection:bg-white selection:text-black ${isDarkTheme ? "bg-black text-white" : "bg-[#f5f5f5] text-black"}`}>
       
       {/* Background Effect */}
-      <div className="noise-overlay"></div>
+      <div className="noise-overlay pointer-events-none"></div>
       <div className="absolute top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_100%,#000_40%,transparent_100%)] ${!isDarkTheme && "opacity-30"}`}></div>
       </div>
-      
+
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-8">
-        
         {/* --- 1. HERO SECTION --- */}
         <section id="hero" className="min-h-screen flex flex-col justify-center pt-32 pb-10">
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -209,7 +199,7 @@ function App() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }} className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2">
-              <motion.div animate={{ y: [-10, 10, -10] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[400px] aspect-[3/4]">
+              <motion.div animate={{ y: [-10, 10, -10] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[400px] aspect-[3/4] will-change-transform">
                 <img src={HeroImage} alt="Hero Object" className="w-full h-full object-contain drop-shadow-2xl" />
               </motion.div>
             </motion.div>
@@ -284,7 +274,7 @@ function App() {
               <div className={`absolute left-4 md:left-[39px] top-4 bottom-0 w-[2px] ${isDarkTheme ? "bg-white/5" : "bg-black/5"}`}></div>
 
               <div className="flex flex-col gap-16">
-                {/* 3A. Educational Path (Selalu Tampil) */}
+                {/* 3A. Educational Path */}
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center gap-4 pl-12 md:pl-[84px]">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}>
@@ -292,15 +282,17 @@ function App() {
                     </div>
                     <h3 className="text-xl font-bold tracking-tight">Educational Path</h3>
                   </div>
+
                   <div className="flex flex-col gap-4">
                     {displayedEducation.map((item, index) => (
                       <motion.div key={item.id} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1, duration: 0.5 }} className="relative flex items-center group pl-12 md:pl-[84px] overflow-hidden">
                         <div className="absolute left-[11px] md:left-[34px] w-3 h-3 rounded-full bg-zinc-700 border-4 border-black group-hover:bg-white group-hover:shadow-[0_0_12px_rgba(255,255,255,0.8)] group-hover:scale-125 transition-all duration-300 z-10"></div>
                         <div className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}></div>
+
                         <div className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-black/20 hover:shadow-lg"}`}>
                           <div className="flex items-center gap-4">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isDarkTheme ? "bg-zinc-900 border-white/10 text-white" : "bg-zinc-50 border-black/10 text-black"}`}>
-                              <i className={`ri-${item.icon} text-xl`}></i>
+                            <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shrink-0 border bg-white ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
+                              <img src={item.logo} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             </div>
                             <div>
                               <h4 className="text-lg font-bold tracking-tight">{item.title}</h4>
@@ -316,7 +308,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* 3B. Project & Competitions (Tampil interaktif Show More) */}
+                {/* 3B. Project & Competitions */}
                 <div className="flex flex-col gap-6 mt-4">
                   <div className="flex items-center gap-4 pl-12 md:pl-[84px]">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}>
@@ -328,14 +320,7 @@ function App() {
                   <div className="flex flex-col gap-4">
                     <AnimatePresence initial={false}>
                       {displayedExperience.map((item, index) => (
-                        <motion.div
-                          key={item.id}
-                          initial={{ opacity: 0, height: 0, y: -20 }}
-                          animate={{ opacity: 1, height: "auto", y: 0 }}
-                          exit={{ opacity: 0, height: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
-                          className="relative flex items-center group pl-12 md:pl-[84px] origin-top overflow-hidden"
-                        >
+                        <motion.div key={item.id} initial={{ opacity: 0, height: 0, y: -20 }} animate={{ opacity: 1, height: "auto", y: 0 }} exit={{ opacity: 0, height: 0, y: -20 }} transition={{ duration: 0.3 }} className="relative flex items-center group pl-12 md:pl-[84px] origin-top overflow-hidden">
                           <div className="absolute left-[11px] md:left-[34px] w-3 h-3 rounded-full bg-zinc-700 border-4 border-black group-hover:bg-blue-500 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.8)] group-hover:scale-125 transition-all duration-300 z-10"></div>
                           <div className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}></div>
                           <div className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-blue-500/30 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-blue-500/30 hover:shadow-lg"}`}>
@@ -359,12 +344,7 @@ function App() {
 
                   {/* Tombol Toggle Show Less/More */}
                   <div className="pl-12 md:pl-[84px] mt-4">
-                    <button
-                      onClick={() => setShowAllTimeline(!showAllTimeline)}
-                      className={`px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all hover:scale-105 ${
-                        isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
-                      }`}
-                    >
+                    <button onClick={() => setShowAllTimeline(!showAllTimeline)} className={`px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all hover:scale-105 ${isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"}`}>
                       {showAllTimeline ? "Show Less" : "Show All Timeline"}
                       <i className={`ri-arrow-${showAllTimeline ? "up" : "down"}-s-line ml-1`}></i>
                     </button>
@@ -379,9 +359,7 @@ function App() {
         <section id="highlights" className={`py-24 border-t relative ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="text-center md:text-left mb-12">
             <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Sekilas Tentang Saya</h2>
-            <p className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
-              Eksplorasi teknologi, proyek terkini, hingga selera hiburan saya.
-            </p>
+            <p className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>Eksplorasi teknologi, proyek terkini, hingga selera hiburan saya.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             
@@ -509,7 +487,7 @@ function App() {
               {listTools.map((tool) => (
                 <motion.div key={tool.id} variants={{ hidden: { opacity: 0, y: 30, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 15 } } }} whileHover={{ y: -8, scale: 1.05 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className={`group relative p-6 rounded-3xl border flex flex-col items-center justify-center gap-5 overflow-hidden backdrop-blur-sm cursor-pointer ${isDarkTheme ? "bg-[#111111]/80 border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.5)]" : "bg-white/80 border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.05)]"}`}>
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isDarkTheme ? "bg-gradient-to-b from-white/10 to-transparent" : "bg-gradient-to-b from-black/5 to-transparent"}`} />
-                  <motion.img src={tool.gambar} alt={tool.nama} className="w-12 h-12 object-contain relative z-10 drop-shadow-lg" whileHover={{ rotate: [0, -10, 10, -10, 10, 0] }} transition={{ duration: 0.5, ease: "easeInOut" }} />
+                  <motion.img src={tool.gambar} alt={tool.nama} className="w-12 h-12 object-contain relative z-10 drop-shadow-lg will-change-transform" whileHover={{ rotate: [0, -10, 10, -10, 10, 0] }} transition={{ duration: 0.5, ease: "easeInOut" }} />
                   <h4 className="font-bold text-sm tracking-wide relative z-10">{tool.nama}</h4>
                 </motion.div>
               ))}
@@ -580,31 +558,26 @@ function App() {
           </motion.div>
         </section>
 
-       {/* ========================================= */}
+        {/* ========================================= */}
         {/* 7. CONTACT SECTION (Modern 2-Column Split)  */}
         {/* ========================================= */}
         <section id="contact" className={`py-32 relative overflow-hidden border-t ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
-          {/* Latar Belakang Dekoratif (Glow Halus) */}
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[150px] opacity-10 pointer-events-none bg-blue-500"></div>
+          {/* Menghapus rotasi/blur berlebih agar lebih ringan di GPU */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-10 pointer-events-none bg-blue-500"></div>
 
           <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
               
               {/* KOLOM KIRI: Teks & Info Kontak Cepat */}
-              <motion.div 
-                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
-                className="flex flex-col gap-8"
-              >
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="flex flex-col gap-8">
                 <div>
                   <motion.div variants={fadeUp} className="flex items-center gap-4 mb-6">
                     <span className={`w-8 h-px ${isDarkTheme ? "bg-white/30" : "bg-black/30"}`}></span>
                     <span className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}>GET IN TOUCH</span>
                   </motion.div>
-                  
                   <motion.h2 variants={fadeUp} className="text-5xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6">
                     Let's Start <br className="hidden md:block"/> Talking.
                   </motion.h2>
-                  
                   <motion.p variants={fadeUp} className={`text-base md:text-lg max-w-md leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
                     Punya ide proyek yang menarik, mencari partner kolaborasi, atau sekadar ingin menyapa? Jangan ragu untuk menghubungi saya. <em className={isDarkTheme ? "text-white" : "text-black"}>*My inbox is always open.*</em>
                   </motion.p>
@@ -612,8 +585,6 @@ function App() {
 
                 {/* List Kontak Cepat dengan Efek Menyala saat Hover */}
                 <motion.div variants={fadeUp} className="flex flex-col gap-6 mt-4">
-                  
-                  {/* Email Box */}
                   <div className={`group flex items-center gap-6 pb-6 border-b ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
                     <div className={`w-14 h-14 shrink-0 rounded-full flex items-center justify-center border transition-all duration-300 ${isDarkTheme ? "bg-[#111] border-white/10 group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]" : "bg-white border-black/10 shadow-sm"}`}>
                       <i className={`ri-mail-line text-xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 group-hover:text-white" : "text-zinc-500 group-hover:text-black"}`}></i>
@@ -626,7 +597,6 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Lokasi Box */}
                   <div className="group flex items-center gap-6">
                     <div className={`w-14 h-14 shrink-0 rounded-full flex items-center justify-center border transition-all duration-300 ${isDarkTheme ? "bg-[#111] border-white/10 group-hover:border-white/50 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]" : "bg-white border-black/10 shadow-sm"}`}>
                       <i className={`ri-map-pin-line text-xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 group-hover:text-white" : "text-zinc-500 group-hover:text-black"}`}></i>
@@ -639,28 +609,19 @@ function App() {
                       </p>
                     </div>
                   </div>
-
                 </motion.div>
               </motion.div>
 
               {/* KOLOM KANAN: Formulir Interaktif / Kotak Pesan */}
-              <motion.div 
-                initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, ease: "easeOut" }}
-              >
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8, ease: "easeOut" }}>
                 <div className={`w-full p-8 md:p-10 rounded-[2.5rem] border shadow-2xl relative ${isDarkTheme ? "bg-[#0a0a0a] border-white/10" : "bg-white border-black/10"}`}>
                   
-                  {/* Toggles Tipe Pesan (Logic ganti ke WA atau Email) */}
+                  {/* Toggles Tipe Pesan */}
                   <div className={`flex p-1.5 rounded-2xl mb-8 ${isDarkTheme ? "bg-[#111] border border-white/5" : "bg-zinc-100 border border-black/5"}`}>
-                    <button 
-                      onClick={() => setContactMethod("email")}
-                      className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "email" ? (isDarkTheme ? "bg-[#1f1f1f] text-white shadow-sm" : "bg-white text-black shadow-sm") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}
-                    >
+                    <button onClick={() => setContactMethod("email")} className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "email" ? (isDarkTheme ? "bg-[#1f1f1f] text-white shadow-sm" : "bg-white text-black shadow-sm") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}>
                       <i className="ri-mail-send-line mr-2"></i> Standard Email
                     </button>
-                    <button 
-                      onClick={() => setContactMethod("wa")}
-                      className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "wa" ? (isDarkTheme ? "bg-[#1f1f1f] text-green-400 shadow-sm border border-green-500/20" : "bg-white text-green-600 shadow-sm border border-green-500/20") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}
-                    >
+                    <button onClick={() => setContactMethod("wa")} className={`flex-1 py-3 text-xs font-bold tracking-widest uppercase rounded-xl transition-all ${contactMethod === "wa" ? (isDarkTheme ? "bg-[#1f1f1f] text-green-400 shadow-sm border border-green-500/20" : "bg-white text-green-600 shadow-sm border border-green-500/20") : (isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black")}`}>
                       <i className="ri-whatsapp-line mr-2"></i> WhatsApp
                     </button>
                   </div>
@@ -669,27 +630,14 @@ function App() {
                   <form className="flex flex-col gap-6" onSubmit={contactMethod === "wa" ? handleWhatsAppSubmit : (e) => e.preventDefault()}>
                     <div className="flex flex-col gap-2">
                       <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>What's your name?</label>
-                      <input 
-                        type="text" 
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        placeholder="John Doe" 
-                        className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
-                      />
+                      <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="John Doe" className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`} />
                     </div>
                     
-                    {/* Input Email hanya tampil jika mode Email dipilih */}
                     <AnimatePresence>
                       {contactMethod === "email" && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="flex flex-col gap-2 overflow-hidden">
                           <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>Your email address</label>
-                          <input 
-                            type="email" 
-                            value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            placeholder="john@example.com" 
-                            className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
-                          />
+                          <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="john@example.com" className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`} />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -697,11 +645,7 @@ function App() {
                     <div className="flex flex-col gap-2">
                       <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>What are you interested in?</label>
                       <div className="relative">
-                        <select 
-                          value={formData.interest}
-                          onChange={(e) => setFormData({...formData, interest: e.target.value})}
-                          className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium appearance-none cursor-pointer ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black"}`}
-                        >
+                        <select value={formData.interest} onChange={(e) => setFormData({...formData, interest: e.target.value})} className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium appearance-none cursor-pointer ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black"}`}>
                           <option value="Web Development">Web Development</option>
                           <option value="Game Development">Game Development</option>
                           <option value="UI/UX Design">UI/UX Design</option>
@@ -714,30 +658,13 @@ function App() {
 
                     <div className="flex flex-col gap-2">
                       <label className={`text-[10px] font-bold tracking-widest uppercase ml-1 ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>Message</label>
-                      <textarea 
-                        rows="3"
-                        value={formData.message}
-                        onChange={(e) => setFormData({...formData, message: e.target.value})}
-                        placeholder="Tell me about your project, timeline, or just say hello..." 
-                        className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium resize-none ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}
-                      ></textarea>
+                      <textarea rows="3" value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} placeholder="Tell me about your project, timeline, or just say hello..." className={`w-full px-5 py-4 rounded-2xl border outline-none transition-all text-sm font-medium resize-none ${isDarkTheme ? "bg-[#111] border-white/10 focus:border-white/30 text-white placeholder-zinc-700" : "bg-zinc-50 border-black/10 focus:border-black/30 text-black placeholder-zinc-400"}`}></textarea>
                     </div>
 
-                    {/* Tombol Submit Berubah Warna Tergantung Mode (WA / Email) */}
-                    <motion.button 
-                      type="submit"
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                      className={`w-full py-5 rounded-2xl font-black tracking-widest uppercase text-xs mt-2 flex justify-center items-center gap-2 transition-all duration-300 ${
-                        contactMethod === "wa" 
-                          ? "bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.2)]" 
-                          : (isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800")
-                      }`}
-                    >
-                      {contactMethod === "wa" ? "Send Message via WA" : "Send To Inbox"} 
-                      <i className={contactMethod === "wa" ? "ri-whatsapp-line text-lg" : "ri-send-plane-fill text-lg"}></i>
+                    <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`w-full py-5 rounded-2xl font-black tracking-widest uppercase text-xs mt-2 flex justify-center items-center gap-2 transition-all duration-300 ${contactMethod === "wa" ? "bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.2)]" : (isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800")}`}>
+                      {contactMethod === "wa" ? "Send Message via WA" : "Send To Inbox"} <i className={contactMethod === "wa" ? "ri-whatsapp-line text-lg" : "ri-send-plane-fill text-lg"}></i>
                     </motion.button>
                     
-                    {/* Hint kecil untuk WA */}
                     <AnimatePresence>
                       {contactMethod === "wa" && (
                         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-[10px] text-center text-zinc-500 mt-[-10px]">
@@ -745,7 +672,6 @@ function App() {
                         </motion.p>
                       )}
                     </AnimatePresence>
-
                   </form>
 
                 </div>
@@ -763,88 +689,48 @@ function App() {
       {/* 8. FOOTER SECTION (Mega Modern Layout)      */}
       {/* ========================================= */}
       <footer className={`relative z-20 pt-24 pb-8 md:pb-12 overflow-hidden ${isDarkTheme ? "bg-[#050505]" : "bg-zinc-100"}`}>
-        {/* Garis atas bergradasi */}
         <div className={`absolute top-0 left-0 w-full h-px ${isDarkTheme ? "bg-gradient-to-r from-transparent via-white/20 to-transparent" : "bg-gradient-to-r from-transparent via-black/20 to-transparent"}`}></div>
 
         <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-8 flex flex-col gap-20">
           
-          {/* Top Part: Giant Text & CTA */}
           <div className="relative flex flex-col items-center justify-center text-center py-10">
-            {/* Teks Raksasa Transparan di Belakang */}
-            <motion.h1 
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={`text-[22vw] md:text-[18vw] font-black tracking-tighter leading-none select-none pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
-                isDarkTheme ? "text-white/[0.03]" : "text-black/[0.03]"
-              }`}
-            >
+            <motion.h1 initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 1, ease: "easeOut" }} className={`text-[22vw] md:text-[18vw] font-black tracking-tighter leading-none select-none pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${isDarkTheme ? "text-white/[0.03]" : "text-black/[0.03]"}`}>
               IQBAL.
             </motion.h1>
 
-            {/* Tombol CTA di Depan */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="relative z-10 flex flex-col items-center gap-6"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} className="relative z-10 flex flex-col items-center gap-6">
               <h3 className="text-3xl md:text-5xl font-black tracking-tight">Got a project?</h3>
-              <a 
-                href="mailto:emailanda@gmail.com" 
-                className={`group flex items-center gap-3 px-8 py-4 md:px-10 md:py-5 rounded-full font-bold tracking-widest uppercase text-xs shadow-2xl transition-all hover:scale-105 active:scale-95 ${
-                  isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
-                }`}
-              >
+              <a href="#contact" className={`group flex items-center gap-3 px-8 py-4 md:px-10 md:py-5 rounded-full font-bold tracking-widest uppercase text-xs shadow-2xl transition-all hover:scale-105 active:scale-95 ${isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"}`}>
                 Let's Talk <i className="ri-arrow-right-up-line text-lg group-hover:rotate-45 transition-transform"></i>
               </a>
             </motion.div>
           </div>
 
-          {/* Garis Pemisah Tengah */}
           <div className={`w-full h-px ${isDarkTheme ? "bg-white/10" : "bg-black/10"}`}></div>
 
-          {/* Bottom Part: Links, Time, & Back to Top */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4">
             
-            {/* Kiri: Local Time & Location */}
             <div className="flex flex-col items-center md:items-start gap-1.5 w-full md:w-1/3">
               <div className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 Bogor, Indonesia
               </div>
-              <p className={`text-xs font-medium tracking-widest uppercase flex items-center gap-2 ${isDarkTheme ? "text-zinc-300" : "text-zinc-700"}`}>
-                <i className="ri-time-line"></i> {formatTime(currentTime)} WIB
-              </p>
+              
+              {/* KOMPONEN LIVE CLOCK DIMASUKKAN KE SINI */}
+              <LiveClock isDarkTheme={isDarkTheme} />
+
             </div>
 
-            {/* Tengah: Social Icons */}
             <div className="flex items-center justify-center gap-3 w-full md:w-1/3">
                {["github-fill", "linkedin-fill", "instagram-line"].map((icon, i) => (
-                  <a 
-                    key={i} 
-                    href="#" 
-                    className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all hover:-translate-y-1 ${
-                      isDarkTheme 
-                        ? "border-white/10 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/5" 
-                        : "border-black/10 text-zinc-500 hover:text-black hover:border-black/30 hover:bg-black/5"
-                    }`}
-                  >
+                  <a key={i} href="#" className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all hover:-translate-y-1 ${isDarkTheme ? "border-white/10 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/5" : "border-black/10 text-zinc-500 hover:text-black hover:border-black/30 hover:bg-black/5"}`}>
                     <i className={`ri-${icon} text-xl`}></i>
                   </a>
                ))}
             </div>
 
-            {/* Kanan: Copyright & Back to Top */}
             <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-1/3">
-              <button 
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
-                className={`group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase transition-colors ${
-                  isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"
-                }`}
-              >
+              <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className={`group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase transition-colors ${isDarkTheme ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"}`}>
                 Kembali ke Atas <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all group-hover:-translate-y-1 ${isDarkTheme ? "border-white/20 bg-white/10 text-white" : "border-black/20 bg-black/10 text-black"}`}><i className="ri-arrow-up-line text-xs"></i></div>
               </button>
               <p className={`text-[10px] font-medium tracking-widest uppercase ${isDarkTheme ? "text-zinc-600" : "text-zinc-400"}`}>
@@ -864,8 +750,5 @@ function App() {
     </div>
   );
 }
-
-
-
 
 export default App;

@@ -8,17 +8,17 @@ const DockIcon = ({ item, mouseX, scrollToSection, isDarkTheme }) => {
   const ref = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Deteksi jarak mouse (Diperlebar menjadi 150 agar ikon tetangga bereaksi lebih awal dan mulus)
+  // Deteksi jarak mouse
   const distance = useTransform(mouseX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
-  // Kurva animasi (Ukuran base lebih lega, membesar jauh lebih ekstrem saat di tengah)
+  // Kurva animasi
   const sizeTransform = useTransform(distance, [-150, 0, 150], [48, 85, 48]);
   const marginTransform = useTransform(distance, [-150, 0, 150], [6, 20, 6]);
 
-  // Efek Spring dibebaskan (stiffness direndahkan, damping diturunkan agar membal & organik)
+  // Efek Spring
   const size = useSpring(sizeTransform, { mass: 0.1, stiffness: 150, damping: 12 });
   const margin = useSpring(marginTransform, { mass: 0.1, stiffness: 150, damping: 12 });
 
@@ -56,7 +56,7 @@ const DockIcon = ({ item, mouseX, scrollToSection, isDarkTheme }) => {
       >
         <i className={`ri-${item.icon} transition-all duration-300`} style={{ fontSize: isHovered ? '28px' : '20px' }}></i>
         
-        {/* Titik indikator aktif melayang di bawah icon */}
+        {/* Titik indikator aktif */}
         {isHovered && (
           <motion.div 
             layoutId="dockIndicator"
@@ -76,7 +76,7 @@ const DockIcon = ({ item, mouseX, scrollToSection, isDarkTheme }) => {
 const Navbar = () => {
   const [active, setActive] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showBanner, setShowBanner] = useState(true); // State untuk Top Banner Crafting
+  const [showBanner, setShowBanner] = useState(true); 
   
   const { t, language, toggleLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
@@ -107,7 +107,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Import Font Khusus "Syne" (Sangat Gen Z & Edgy) untuk Logo */}
+      {/* Import Font Khusus "Syne" untuk Logo */}
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
@@ -117,23 +117,23 @@ const Navbar = () => {
         `}
       </style>
 
-      {/* 1. KONTainer HEADER GLOBAL (Sticky Atas) */}
+      {/* 1. KONTainer HEADER GLOBAL */}
       <header className="fixed top-0 left-0 right-0 z-[110] flex flex-col">
         
-        {/* A. BANNER "CRAFTING" (Bisa di-close oleh user) */}
+        {/* A. BANNER "CRAFTING" */}
         <AnimatePresence>
           {showBanner && (
             <motion.div
               initial={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0, overflow: "hidden" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`w-full flex items-center justify-center py-2.5 px-4 relative z-20 ${
+              className={`w-full flex items-center justify-center py-2 px-4 relative z-20 ${
                 isDarkTheme ? "bg-[#050505] border-b border-white/5" : "bg-zinc-100 border-b border-black/5"
               }`}
             >
-              <div className="flex items-center gap-2.5 text-xs md:text-sm">
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full border ${isDarkTheme ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"}`}>
-                  <i className="ri-code-s-slash-line text-[10px]"></i>
+              <div className="flex items-center gap-2 text-xs md:text-[13px]">
+                <div className={`flex items-center justify-center w-5 h-5 rounded-full border ${isDarkTheme ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"}`}>
+                  <i className="ri-code-s-slash-line text-[9px]"></i>
                 </div>
                 <span className={`tracking-wide ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
                   Crafting modern <strong className={`font-bold ${isDarkTheme ? "text-white" : "text-black"}`}>digital experiences.</strong>
@@ -142,59 +142,61 @@ const Navbar = () => {
               
               <button
                 onClick={() => setShowBanner(false)}
-                className={`absolute right-4 w-6 h-6 flex items-center justify-center rounded-full transition-colors ${
+                className={`absolute right-4 w-5 h-5 flex items-center justify-center rounded-full transition-colors ${
                   isDarkTheme ? "bg-white/5 hover:bg-white/15 text-zinc-400" : "bg-black/5 hover:bg-black/15 text-zinc-600"
                 }`}
               >
-                <i className="ri-close-line text-sm"></i>
+                <i className="ri-close-line text-xs"></i>
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* B. NAVBAR UTAMA (Logo & Menu Button) */}
+        {/* B. NAVBAR UTAMA (Dibuat lebih slim dengan py-2) */}
         <motion.nav
           className={`w-full transition-all duration-500 z-10 ${
             active 
               ? isDarkTheme ? "bg-[#0a0a0a]/80 backdrop-blur-xl shadow-lg border-b border-white/5" : "bg-white/80 backdrop-blur-xl shadow-sm border-b border-black/5" 
-              : "bg-transparent py-2"
+              : "bg-transparent py-1"
           }`}
         >
-          <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 py-4 flex items-center justify-between">
+          {/* Padding y diperkecil agar navbar ramping */}
+          <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 py-2.5 flex items-center justify-between">
             
-            {/* Bagian Kiri: Logo Gambar Extra Besar & Teks Font Gen Z */}
+            {/* Bagian Kiri: Logo & Teks */}
             <motion.div 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="logo cursor-pointer shrink-0 flex items-center gap-3 md:gap-5 group" 
+              className="logo cursor-pointer shrink-0 flex items-center gap-4 md:gap-5 group" 
               onClick={() => scrollToSection("hero")}
             >
-              {/* Tempat Logo - Ukuran base lebih besar dan di scale lebih ekstrem */}
-              <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center relative shrink-0">
+              {/* Tempat Logo - Kotak aslinya KECIL (w-10 h-10) agar navbar tidak tebal */}
+              <div className="w-10 h-10 flex items-center justify-center relative shrink-0">
+                {/* Gambar Logo - Namun gambarnya di-SCALE sangat ekstrem agar terlihat membesar keluar jalur */}
                 <img 
                   src="/assets/logo.png" 
                   alt="Iqbal Logo" 
-                  className="absolute w-full h-full object-contain transition-transform duration-500 group-hover:rotate-12 scale-[1.5] md:scale-[1.8]"
+                  className="absolute w-full h-full object-contain transition-transform duration-500 group-hover:rotate-12 scale-[2] md:scale-[2.6]"
                 />
               </div>
               
-              {/* Teks IQBAL (Menggunakan font 'Syne' dan lowercase yang super ngetren) */}
-              <h1 className={`font-genz text-2xl md:text-3xl font-extrabold tracking-tight transition-colors mt-1 ${
+              {/* Teks IQBAL */}
+              <h1 className={`font-genz text-xl md:text-2xl font-extrabold tracking-tight transition-colors mt-1 ${
                 isDarkTheme ? "text-white" : "text-black"
               }`}>
-                baal<span className={isDarkTheme ? "text-blue-500" : "text-blue-600"}></span>
+                baa<span className={isDarkTheme ? "text-black-500" : "text-black-600"}>l</span>
               </h1>
             </motion.div>
 
-            {/* Bagian Kanan: Toggles & Hamburger Bulat */}
+            {/* Bagian Kanan: Toggles & Hamburger */}
             <div className="flex items-center gap-3 shrink-0">
               
-              {/* Toggles (Hanya Desktop) */}
+              {/* Toggles Desktop */}
               <div className="hidden md:flex items-center gap-2">
                 <motion.button
                   whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                   onClick={toggleLanguage}
-                  className={`flex items-center justify-center w-12 h-10 rounded-full text-[11px] font-bold tracking-wider border backdrop-blur-md transition-colors ${
+                  className={`flex items-center justify-center w-11 h-9 rounded-full text-[11px] font-bold tracking-wider border backdrop-blur-md transition-colors ${
                     isDarkTheme ? "bg-white/5 border-white/10 hover:bg-white/10 text-white" : "bg-black/5 border-black/10 hover:bg-black/10 text-black"
                   }`}
                 >
@@ -204,7 +206,7 @@ const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                   onClick={toggleTheme}
-                  className={`flex items-center justify-center w-10 h-10 rounded-full border backdrop-blur-md transition-colors ${
+                  className={`flex items-center justify-center w-9 h-9 rounded-full border backdrop-blur-md transition-colors ${
                     isDarkTheme ? "bg-white/5 border-white/10 hover:bg-white/10 text-white" : "bg-black/5 border-black/10 hover:bg-black/10 text-black"
                   }`}
                 >
@@ -212,18 +214,18 @@ const Navbar = () => {
                 </motion.button>
               </div>
 
-              {/* Hamburger Button Bulat (Sesuai Referensi Gambar Mobile) */}
+              {/* Hamburger Button Mobile */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setMobileMenuOpen(true)}
-                className={`md:hidden flex items-center justify-center w-12 h-12 rounded-full border backdrop-blur-md transition-all ${
+                className={`md:hidden flex items-center justify-center w-10 h-10 rounded-full border backdrop-blur-md transition-all ${
                   isDarkTheme 
                     ? "bg-white/5 border-white/10 hover:bg-white/10 text-white" 
                     : "bg-black/5 border-black/10 hover:bg-black/10 text-black"
                 }`}
               >
-                <i className="ri-menu-line text-xl"></i>
+                <i className="ri-menu-line text-lg"></i>
               </motion.button>
             </div>
 
@@ -232,7 +234,7 @@ const Navbar = () => {
       </header>
 
 
-      {/* 2. DOCK BAWAH - Khusus Desktop (Lebih Elegan & Fluid) */}
+      {/* 2. DOCK BAWAH - Khusus Desktop */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-max px-4 hidden md:block">
         <motion.div
           initial={{ y: 50, opacity: 0 }}
@@ -240,7 +242,6 @@ const Navbar = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           onMouseMove={(e) => mouseX.set(e.pageX)}
           onMouseLeave={() => mouseX.set(-Infinity)}
-          // Efek floating dock yang lebih premium
           className={`flex items-end gap-1 px-4 py-3 h-[76px] rounded-full border backdrop-blur-3xl transition-colors duration-500 origin-bottom ${
             isDarkTheme 
               ? "bg-[#111111]/80 border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.8)]" 
@@ -258,7 +259,6 @@ const Navbar = () => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Latar Belakang Gelap / Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -268,7 +268,6 @@ const Navbar = () => {
               className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm md:hidden cursor-pointer"
             />
 
-            {/* Kotak Drawer Menu (Geser dari kanan) */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -278,7 +277,6 @@ const Navbar = () => {
                 isDarkTheme ? "bg-[#0a0a0a] border-l border-white/5" : "bg-[#fcfcfc] border-l border-black/5"
               }`}
             >
-              {/* Header: Judul "Menu" & Tombol Close X */}
               <div className={`flex items-center justify-between p-6 border-b ${isDarkTheme ? "border-white/5" : "border-black/5"}`}>
                 <span className={`text-xl font-bold tracking-tight ${isDarkTheme ? "text-white" : "text-black"}`}>Menu</span>
                 <button
@@ -291,7 +289,6 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Daftar Tautan Halaman */}
               <div className="flex flex-col gap-1 p-4 overflow-y-auto">
                 {navItems.map((item) => (
                   <button
@@ -314,7 +311,6 @@ const Navbar = () => {
                 ))}
               </div>
 
-              {/* Footer Drawer: Pengaturan Bahasa/Tema & Tombol Contact Us */}
               <div className={`mt-auto p-5 border-t flex flex-col gap-5 ${isDarkTheme ? "border-white/5" : "border-black/5"}`}>
                 
                 <div className="flex items-center justify-between px-2">
