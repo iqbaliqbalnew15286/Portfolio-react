@@ -13,7 +13,7 @@ import EmojiReactions from "./components/EmojiReactions";
 
 function App() {
   // =========================================================================
-  // 1. SEMUA HOOKS (useState, useRef, useEffect) HARUS DI ATAS EARLY RETURN
+  // 1. SEMUA HOOKS (useState, useRef, useEffect) WAJIB DI ATAS EARLY RETURN
   // =========================================================================
   const { t } = useLanguage();
   const { isDark } = useTheme();
@@ -21,19 +21,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   
-  // State Timeline Experience
+  // State Timeline Experience (Untuk tombol Show More / Less)
   const [showAllTimeline, setShowAllTimeline] = useState(false);
   
   // Ref untuk fungsi panah geser Horizontal Carousel
   const carouselRef = useRef(null);
 
-  // Efek Waktu
+  // Efek Update Waktu
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Efek Smooth Scroll
+  // Efek Smooth Scroll Manual
   useEffect(() => {
     const handleNavClick = (e) => {
       const href = e.currentTarget.getAttribute("href");
@@ -50,17 +50,18 @@ function App() {
     links.forEach((link) => link.addEventListener("click", handleNavClick));
     return () =>
       links.forEach((link) =>
-        link.removeEventListener("click", handleNavClick),
+        link.removeEventListener("click", handleNavClick)
       );
   }, []);
 
   // =========================================================================
-  // 2. FUNGSI, VARIABEL DATA, & EARLY RETURN
+  // 2. FUNGSI & DATA (Format Time, Scroll Logic, Array Timeline)
   // =========================================================================
   const formatTime = (date) =>
     date
       .toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
       .replace(".", ":");
+
   const formatDate = (date) =>
     date.toLocaleDateString("id-ID", {
       weekday: "short",
@@ -68,6 +69,7 @@ function App() {
       month: "short",
     });
 
+  // Fungsi untuk tombol panah proyek
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
       const scrollAmount = direction === "left" ? -400 : 400;
@@ -130,342 +132,175 @@ function App() {
     },
   ];
 
-  const displayedEducation = showAllTimeline
-    ? educationalPath
-    : educationalPath.slice(0, 1);
+  // Logika tampilan berdasarkan state
+  const displayedEducation = educationalPath; // Selalu tampil semua
   const displayedExperience = showAllTimeline
     ? professionalExperience
-    : professionalExperience.slice(0, 2);
+    : professionalExperience.slice(0, 1); // Tampil 1 jika tertutup
 
   const isDarkTheme = isDark !== false;
 
+  // Variasi Animasi Framer Motion
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
   };
   const stagger = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
   };
 
-  // --- EARLY RETURN UNTUK LOADING (Harus diletakkan setelah semua Hooks) ---
-  if (isLoading)
+  // =========================================================================
+  // 3. EARLY RETURN UNTUK LOADING (Setelah semua deklarasi Hook & Variabel)
+  // =========================================================================
+  if (isLoading) {
     return <LoadingScreen onComplete={() => setIsLoading(false)} />;
+  }
 
   // =========================================================================
-  // 3. RENDER UI UTAMA
+  // 4. RENDER UI UTAMA (JSX)
   // =========================================================================
   return (
-    <div
-      className={`min-h-screen w-full transition-colors duration-500 overflow-hidden relative selection:bg-white selection:text-black ${isDarkTheme ? "bg-black text-white" : "bg-[#f5f5f5] text-black"}`}
-    >
+    <div className={`min-h-screen w-full transition-colors duration-500 overflow-hidden relative selection:bg-white selection:text-black ${isDarkTheme ? "bg-black text-white" : "bg-[#f5f5f5] text-black"}`}>
+      
+      {/* Background Effect */}
       <div className="noise-overlay"></div>
       <div className="absolute top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-none">
-        <div
-          className={`absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_100%,#000_40%,transparent_100%)] ${!isDarkTheme && "opacity-30"}`}
-        ></div>
+        <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_100%,#000_40%,transparent_100%)] ${!isDarkTheme && "opacity-30"}`}></div>
       </div>
       
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-8">
         
-        {/* 1. HERO SECTION */}
-        <section
-          id="hero"
-          className="min-h-screen flex flex-col justify-center pt-32 pb-10"
-        >
+        {/* --- 1. HERO SECTION --- */}
+        <section id="hero" className="min-h-screen flex flex-col justify-center pt-32 pb-10">
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              animate="visible"
-              className="lg:col-span-7 flex flex-col gap-6 order-2 lg:order-1"
-            >
-              <motion.p
-                variants={fadeUp}
-                className={`text-sm md:text-base font-semibold tracking-[0.2em] uppercase ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}
-              >
+            <motion.div variants={stagger} initial="hidden" animate="visible" className="lg:col-span-7 flex flex-col gap-6 order-2 lg:order-1">
+              <motion.p variants={fadeUp} className={`text-sm md:text-base font-semibold tracking-[0.2em] uppercase ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>
                 Developer
               </motion.p>
-
-              <motion.h1
-                variants={fadeUp}
-                className="text-[3.2rem] leading-[1.05] sm:text-7xl md:text-8xl lg:text-[6rem] font-black tracking-tighter uppercase"
-              >
-                Menciptakan <br />
-                Prototipe <br />
-                Digital
+              <motion.h1 variants={fadeUp} className="text-[3.2rem] leading-[1.05] sm:text-7xl md:text-8xl lg:text-[6rem] font-black tracking-tighter uppercase">
+                Menciptakan <br /> Prototipe <br /> Digital
               </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                className={`text-base md:text-lg max-w-lg leading-relaxed mt-2 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                Saya membangun pengalaman web yang imersif menggunakan teknologi
-                modern. Fokus pada performa, interaksi, dan estetika premium.
+              <motion.p variants={fadeUp} className={`text-base md:text-lg max-w-lg leading-relaxed mt-2 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                Saya membangun pengalaman web yang imersif menggunakan teknologi modern. Fokus pada performa, interaksi, dan estetika premium.
               </motion.p>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.3 }}
-              className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2"
-            >
-              <motion.div
-                animate={{ y: [-10, 10, -10] }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 5,
-                  ease: "easeInOut",
-                }}
-                className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[400px] aspect-[3/4]"
-              >
-                <img
-                  src={HeroImage}
-                  alt="Hero Object"
-                  className="w-full h-full object-contain drop-shadow-2xl"
-                />
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.3 }} className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2">
+              <motion.div animate={{ y: [-10, 10, -10] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[400px] aspect-[3/4]">
+                <img src={HeroImage} alt="Hero Object" className="w-full h-full object-contain drop-shadow-2xl" />
               </motion.div>
             </motion.div>
           </div>
         </section>
 
-        {/* 2. PROFILE SECTION */}
-        <section
-          id="about"
-          className={`py-24 border-t ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-        >
+        {/* --- 2. PROFILE SECTION --- */}
+        <section id="about" className={`py-24 border-t ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-4 flex justify-center lg:justify-start"
-            >
-              <div
-                className={`w-full max-w-[320px] rounded-[2.5rem] p-6 md:p-8 flex flex-col items-center text-center border shadow-2xl ${isDarkTheme ? "bg-[#111111] border-white/10" : "bg-white border-black/10"}`}
-              >
+            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="lg:col-span-4 flex justify-center lg:justify-start">
+              <div className={`w-full max-w-[320px] rounded-[2.5rem] p-6 md:p-8 flex flex-col items-center text-center border shadow-2xl ${isDarkTheme ? "bg-[#111111] border-white/10" : "bg-white border-black/10"}`}>
                 <div className="w-full aspect-[4/5] rounded-[1.5rem] overflow-hidden mb-6 bg-zinc-800">
-                  <img
-                    src={HeroImage}
-                    alt="Muhammad Iqbal"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={HeroImage} alt="Muhammad Iqbal" className="w-full h-full object-cover" />
                 </div>
-
-                <h3 className="text-2xl font-bold tracking-tight mb-1">
-                  Muhammad Iqbal
-                </h3>
-                <p
-                  className={`text-[10px] font-black tracking-widest uppercase mb-5 ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}
-                >
-                  IT Developer
+                <h3 className="text-2xl font-bold tracking-tight mb-1">Muhammad Iqbal</h3>
+                <p className={`text-[10px] font-black tracking-widest uppercase mb-5 ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>IT Developer</p>
+                <p className={`text-xs leading-relaxed mb-8 px-2 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                  Backend Developer & Frontend Engineer building digital masterpieces.
                 </p>
-
-                <p
-                  className={`text-xs leading-relaxed mb-8 px-2 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                >
-                  Backend Developer & Frontend Engineer building digital
-                  masterpieces.
-                </p>
-
                 <div className="flex gap-4">
-                  {["github-line", "linkedin-line", "instagram-line"].map(
-                    (icon, i) => (
-                      <a
-                        key={i}
-                        href="#"
-                        className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:scale-110 ${isDarkTheme ? "border-white/10 hover:bg-white/10 text-white" : "border-black/10 hover:bg-black/5 text-black"}`}
-                      >
-                        <i className={`ri-${icon} text-lg`}></i>
-                      </a>
-                    ),
-                  )}
+                  {["github-line", "linkedin-line", "instagram-line"].map((icon, i) => (
+                    <a key={i} href="#" className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:scale-110 ${isDarkTheme ? "border-white/10 hover:bg-white/10 text-white" : "border-black/10 hover:bg-black/5 text-black"}`}>
+                      <i className={`ri-${icon} text-lg`}></i>
+                    </a>
+                  ))}
                 </div>
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-8 flex flex-col gap-6"
-            >
+            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="lg:col-span-8 flex flex-col gap-6">
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-2">
-                Lebih Dari Sekadar <br className="hidden md:block" />{" "}
-                Development.
+                Lebih Dari Sekadar <br className="hidden md:block" /> Development.
               </h2>
-
-              <div
-                className={`flex flex-col gap-6 text-base md:text-lg leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                <p>
-                  Menggabungkan presisi teknis dengan kreativitas untuk
-                  membangun solusi web yang modern, efisien, dan scalable. Saya
-                  berfokus pada mengubah ide kompleks menjadi aplikasi yang
-                  bersih, mudah dirawat, dan berkinerja tinggi.
-                </p>
-                <p>
-                  Saya Muhammad Iqbal, seorang developer yang mengubah ide
-                  menjadi solusi nyata yang siap digunakan di dunia nyata, serta
-                  menciptakan produk yang benar-benar nyaman dan menyenangkan
-                  bagi penggunanya. Saya bekerja cepat, berpikir strategis, dan
-                  sangat memperhatikan detail.
-                </p>
+              <div className={`flex flex-col gap-6 text-base md:text-lg leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                <p>Menggabungkan presisi teknis dengan kreativitas untuk membangun solusi web yang modern, efisien, dan scalable. Saya berfokus pada mengubah ide kompleks menjadi aplikasi yang bersih, mudah dirawat, dan berkinerja tinggi.</p>
+                <p>Saya Muhammad Iqbal, seorang developer yang mengubah ide menjadi solusi nyata yang siap digunakan di dunia nyata, serta menciptakan produk yang benar-benar nyaman dan menyenangkan bagi penggunanya.</p>
               </div>
-
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mt-6 pt-8 border-t border-white/10">
                 <div>
                   <h4 className="text-4xl lg:text-5xl font-black mb-2">5+</h4>
-                  <p
-                    className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Tahun Pengalaman
-                  </p>
+                  <p className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>Tahun Pengalaman</p>
                 </div>
                 <div>
                   <h4 className="text-4xl lg:text-5xl font-black mb-2">50+</h4>
-                  <p
-                    className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Proyek Selesai
-                  </p>
+                  <p className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>Proyek Selesai</p>
                 </div>
                 <div className="col-span-2 md:col-span-1">
                   <h4 className="text-4xl lg:text-5xl font-black mb-2">100%</h4>
-                  <p
-                    className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}
-                  >
-                    Berorientasi Kualitas
-                  </p>
+                  <p className={`text-[10px] font-bold tracking-widest uppercase ${isDarkTheme ? "text-zinc-500" : "text-zinc-400"}`}>Berorientasi Kualitas</p>
                 </div>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* 3. TIMELINE / EXPERIENCE SECTION */}
-        <section
-          id="experience"
-          className={`py-24 border-t relative overflow-hidden ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-        >
+        {/* --- 3. TIMELINE / EXPERIENCE SECTION --- */}
+        <section id="experience" className={`py-24 border-t relative overflow-hidden ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="grid lg:grid-cols-12 gap-16 lg:gap-8 relative">
             <div className="lg:col-span-5 relative">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6 }}
-                className="lg:sticky lg:top-40 flex flex-col gap-6"
-              >
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase border w-fit ${
-                    isDarkTheme
-                      ? "bg-white/5 border-white/10 text-zinc-300"
-                      : "bg-black/5 border-black/10 text-zinc-600"
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>{" "}
-                  Track Record
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="lg:sticky lg:top-40 flex flex-col gap-6">
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase border w-fit ${isDarkTheme ? "bg-white/5 border-white/10 text-zinc-300" : "bg-black/5 border-black/10 text-zinc-600"}`}>
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Track Record
                 </div>
-
-                <h2 className="text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">
-                  Professional <br /> Experience.
-                </h2>
-
-                <p
-                  className={`text-base md:text-lg max-w-md leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                >
-                  Perjalanan pendidikan, karier, kolaborasi, dan proyek
-                  kompetitif dalam membangun ekosistem digital serta pengalaman
-                  interaktif.
+                <h2 className="text-5xl md:text-6xl font-black tracking-tight leading-[1.1]">Professional <br /> Experience.</h2>
+                <p className={`text-base md:text-lg max-w-md leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                  Perjalanan pendidikan, karier, kolaborasi, dan proyek kompetitif dalam membangun ekosistem digital serta pengalaman interaktif.
                 </p>
               </motion.div>
             </div>
 
             <div className="lg:col-span-7 relative">
-              <div
-                className={`absolute left-4 md:left-[39px] top-4 bottom-0 w-[2px] ${isDarkTheme ? "bg-white/5" : "bg-black/5"}`}
-              ></div>
+              <div className={`absolute left-4 md:left-[39px] top-4 bottom-0 w-[2px] ${isDarkTheme ? "bg-white/5" : "bg-black/5"}`}></div>
 
               <div className="flex flex-col gap-16">
-                {/* Educational Path */}
+                {/* 3A. Educational Path (Selalu Tampil) */}
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center gap-4 pl-12 md:pl-[84px]">
-                    <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}
-                    >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}>
                       <i className="ri-building-2-line text-sm"></i>
                     </div>
-                    <h3 className="text-xl font-bold tracking-tight">
-                      Educational Path
-                    </h3>
+                    <h3 className="text-xl font-bold tracking-tight">Educational Path</h3>
                   </div>
-
                   <div className="flex flex-col gap-4">
-                    <AnimatePresence initial={false}>
-                      {displayedEducation.map((item, index) => (
-                        <motion.div
-                          key={item.id}
-                          initial={{ opacity: 0, height: 0, y: -20 }}
-                          animate={{ opacity: 1, height: "auto", y: 0 }}
-                          exit={{ opacity: 0, height: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
-                          className="relative flex items-center group pl-12 md:pl-[84px] origin-top overflow-hidden"
-                        >
-                          <div className="absolute left-[11px] md:left-[34px] w-3 h-3 rounded-full bg-zinc-700 border-4 border-black group-hover:bg-white group-hover:shadow-[0_0_12px_rgba(255,255,255,0.8)] group-hover:scale-125 transition-all duration-300 z-10"></div>
-                          <div
-                            className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}
-                          ></div>
-                          <div
-                            className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-black/20 hover:shadow-lg"}`}
-                          >
-                            <div className="flex items-center gap-4">
-                              <div
-                                className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isDarkTheme ? "bg-zinc-900 border-white/10 text-white" : "bg-zinc-50 border-black/10 text-black"}`}
-                              >
-                                <i className={`ri-${item.icon} text-xl`}></i>
-                              </div>
-                              <div>
-                                <h4 className="text-lg font-bold tracking-tight">
-                                  {item.title}
-                                </h4>
-                                <p
-                                  className={`text-sm mt-0.5 ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}
-                                >
-                                  {item.subtitle}
-                                </p>
-                              </div>
+                    {displayedEducation.map((item, index) => (
+                      <motion.div key={item.id} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1, duration: 0.5 }} className="relative flex items-center group pl-12 md:pl-[84px] overflow-hidden">
+                        <div className="absolute left-[11px] md:left-[34px] w-3 h-3 rounded-full bg-zinc-700 border-4 border-black group-hover:bg-white group-hover:shadow-[0_0_12px_rgba(255,255,255,0.8)] group-hover:scale-125 transition-all duration-300 z-10"></div>
+                        <div className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}></div>
+                        <div className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-black/20 hover:shadow-lg"}`}>
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isDarkTheme ? "bg-zinc-900 border-white/10 text-white" : "bg-zinc-50 border-black/10 text-black"}`}>
+                              <i className={`ri-${item.icon} text-xl`}></i>
                             </div>
-                            <div
-                              className={`shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase border w-fit ${isDarkTheme ? "bg-white/5 border-white/10 text-zinc-400" : "bg-black/5 border-black/10 text-zinc-500"}`}
-                            >
-                              {item.date}
+                            <div>
+                              <h4 className="text-lg font-bold tracking-tight">{item.title}</h4>
+                              <p className={`text-sm mt-0.5 ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}>{item.subtitle}</p>
                             </div>
                           </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+                          <div className={`shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase border w-fit ${isDarkTheme ? "bg-white/5 border-white/10 text-zinc-400" : "bg-black/5 border-black/10 text-zinc-500"}`}>
+                            {item.date}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Project & Competitions */}
+                {/* 3B. Project & Competitions (Tampil interaktif Show More) */}
                 <div className="flex flex-col gap-6 mt-4">
                   <div className="flex items-center gap-4 pl-12 md:pl-[84px]">
-                    <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}
-                    >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-sm ${isDarkTheme ? "bg-zinc-900 border-white/10 text-zinc-400" : "bg-white border-black/10 text-zinc-600"}`}>
                       <i className="ri-gamepad-line text-sm"></i>
                     </div>
-                    <h3 className="text-xl font-bold tracking-tight">
-                      Project & Competitions
-                    </h3>
+                    <h3 className="text-xl font-bold tracking-tight">Project & Competitions</h3>
                   </div>
 
                   <div className="flex flex-col gap-4">
@@ -480,32 +315,18 @@ function App() {
                           className="relative flex items-center group pl-12 md:pl-[84px] origin-top overflow-hidden"
                         >
                           <div className="absolute left-[11px] md:left-[34px] w-3 h-3 rounded-full bg-zinc-700 border-4 border-black group-hover:bg-blue-500 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.8)] group-hover:scale-125 transition-all duration-300 z-10"></div>
-                          <div
-                            className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}
-                          ></div>
-                          <div
-                            className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-blue-500/30 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-blue-500/30 hover:shadow-lg"}`}
-                          >
+                          <div className={`absolute left-[20px] md:left-[40px] w-8 md:w-11 h-[2px] transition-colors duration-300 ${isDarkTheme ? "bg-white/5 group-hover:bg-white/20" : "bg-black/5 group-hover:bg-black/20"}`}></div>
+                          <div className={`w-full flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-[1.5rem] border transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-blue-500/30 hover:bg-[#111111]" : "bg-white border-black/5 hover:border-blue-500/30 hover:shadow-lg"}`}>
                             <div className="flex items-center gap-4">
-                              <div
-                                className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isDarkTheme ? "bg-zinc-900 border-white/10 text-white" : "bg-zinc-50 border-black/10 text-black"}`}
-                              >
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isDarkTheme ? "bg-zinc-900 border-white/10 text-white" : "bg-zinc-50 border-black/10 text-black"}`}>
                                 <i className={`ri-${item.icon} text-xl`}></i>
                               </div>
                               <div>
-                                <h4 className="text-lg font-bold tracking-tight">
-                                  {item.title}
-                                </h4>
-                                <p
-                                  className={`text-sm mt-0.5 ${isDarkTheme ? "text-blue-400/80" : "text-blue-600/80"}`}
-                                >
-                                  {item.subtitle}
-                                </p>
+                                <h4 className="text-lg font-bold tracking-tight">{item.title}</h4>
+                                <p className={`text-sm mt-0.5 ${isDarkTheme ? "text-blue-400/80" : "text-blue-600/80"}`}>{item.subtitle}</p>
                               </div>
                             </div>
-                            <div
-                              className={`shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase border w-fit ${isDarkTheme ? "bg-white/5 border-white/10 text-zinc-400" : "bg-black/5 border-black/10 text-zinc-500"}`}
-                            >
+                            <div className={`shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase border w-fit ${isDarkTheme ? "bg-white/5 border-white/10 text-zinc-400" : "bg-black/5 border-black/10 text-zinc-500"}`}>
                               {item.date}
                             </div>
                           </div>
@@ -514,20 +335,16 @@ function App() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Toggle Button Show All / Less */}
+                  {/* Tombol Toggle Show Less/More */}
                   <div className="pl-12 md:pl-[84px] mt-4">
                     <button
                       onClick={() => setShowAllTimeline(!showAllTimeline)}
                       className={`px-8 py-3.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all hover:scale-105 ${
-                        isDarkTheme
-                          ? "bg-white text-black hover:bg-zinc-200"
-                          : "bg-black text-white hover:bg-zinc-800"
+                        isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
                       }`}
                     >
-                      {showAllTimeline ? "Show Less" : "Show All Timeline"}{" "}
-                      <i
-                        className={`ri-arrow-${showAllTimeline ? "up" : "down"}-s-line ml-1`}
-                      ></i>
+                      {showAllTimeline ? "Show Less" : "Show All Timeline"}
+                      <i className={`ri-arrow-${showAllTimeline ? "up" : "down"}-s-line ml-1`}></i>
                     </button>
                   </div>
                 </div>
@@ -536,569 +353,197 @@ function App() {
           </div>
         </section>
 
-        {/* 4. HIGHLIGHTS / BENTO GRID SECTION */}
-        <section
-          id="highlights"
-          className={`py-24 border-t relative ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-        >
+        {/* --- 4. HIGHLIGHTS / BENTO GRID SECTION --- */}
+        <section id="highlights" className={`py-24 border-t relative ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="text-center md:text-left mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-              Sekilas Tentang Saya
-            </h2>
-            <p
-              className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-            >
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Sekilas Tentang Saya</h2>
+            <p className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
               Eksplorasi teknologi, proyek terkini, hingga selera hiburan saya.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
             {/* Spotify */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-center group transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5 hover:border-green-500/30"
-                  : "bg-white border-black/5 hover:border-green-500/30"
-              }`}
-            >
-              <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
-                <i className="ri-spotify-fill text-5xl text-green-500"></i>
-              </div>
+            <div className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-center group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-green-500/30" : "bg-white border-black/5 hover:border-green-500/30"}`}>
+              <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-100 transition-opacity duration-500"><i className="ri-spotify-fill text-5xl text-green-500"></i></div>
               <div className="flex items-center gap-6 relative z-10">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg shrink-0 border border-white/10">
-                  <img
-                    src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=500&auto=format&fit=crop"
-                    alt="Album Cover"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
+                  <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=500&auto=format&fit=crop" alt="Album Cover" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold tracking-widest text-green-500 uppercase">
-                      Currently Playing
-                    </span>
+                    <span className="text-[10px] font-bold tracking-widest text-green-500 uppercase">Currently Playing</span>
                     <div className="flex gap-[2px] items-end h-3">
-                      <motion.div
-                        animate={{ height: ["40%", "100%", "40%"] }}
-                        transition={{ repeat: Infinity, duration: 0.8 }}
-                        className="w-1 bg-green-500 rounded-full"
-                      ></motion.div>
-                      <motion.div
-                        animate={{ height: ["70%", "30%", "70%"] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 0.8,
-                          delay: 0.2,
-                        }}
-                        className="w-1 bg-green-500 rounded-full"
-                      ></motion.div>
-                      <motion.div
-                        animate={{ height: ["30%", "80%", "30%"] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 0.8,
-                          delay: 0.4,
-                        }}
-                        className="w-1 bg-green-500 rounded-full"
-                      ></motion.div>
+                      <motion.div animate={{ height: ["40%", "100%", "40%"] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-1 bg-green-500 rounded-full"></motion.div>
+                      <motion.div animate={{ height: ["70%", "30%", "70%"] }} transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }} className="w-1 bg-green-500 rounded-full"></motion.div>
+                      <motion.div animate={{ height: ["30%", "80%", "30%"] }} transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }} className="w-1 bg-green-500 rounded-full"></motion.div>
                     </div>
                   </div>
-                  <h3 className="text-2xl font-black tracking-tight mb-1">
-                    Push to Production
-                  </h3>
-                  <p
-                    className={`text-sm ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                  >
-                    From Daily Mix Playlist
-                  </p>
+                  <h3 className="text-2xl font-black tracking-tight mb-1">Push to Production</h3>
+                  <p className={`text-sm ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>From Daily Mix Playlist</p>
                 </div>
               </div>
             </div>
 
             {/* Github */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20"
-                  : "bg-white border-black/5 hover:border-black/20"
-              }`}
-            >
+            <div className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20" : "bg-white border-black/5 hover:border-black/20"}`}>
               <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase">
-                  <i className="ri-github-fill text-lg"></i> GitHub
-                </div>
+                <div className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase"><i className="ri-github-fill text-lg"></i> GitHub</div>
                 <i className="ri-external-link-line opacity-0 group-hover:opacity-100 transition-opacity"></i>
               </div>
-
               <div className="grid grid-cols-12 gap-1.5 opacity-80 mb-4">
                 {Array.from({ length: 36 }).map((_, i) => {
                   const isGreen = Math.random() > 0.5;
                   const isPurple = Math.random() > 0.85;
                   const opacity = Math.random() * 0.8 + 0.2;
-                  return (
-                    <motion.div
-                      key={i}
-                      whileHover={{ scale: 1.5, zIndex: 10 }}
-                      className={`w-full aspect-square rounded-[3px] transition-colors ${
-                        isPurple
-                          ? "bg-violet-500"
-                          : isGreen
-                            ? "bg-green-500"
-                            : isDarkTheme
-                              ? "bg-zinc-800"
-                              : "bg-zinc-200"
-                      }`}
-                      style={{ opacity: isGreen || isPurple ? opacity : 0.5 }}
-                    />
-                  );
+                  return <motion.div key={i} whileHover={{ scale: 1.5, zIndex: 10 }} className={`w-full aspect-square rounded-[3px] transition-colors ${isPurple ? "bg-violet-500" : isGreen ? "bg-green-500" : isDarkTheme ? "bg-zinc-800" : "bg-zinc-200"}`} style={{ opacity: isGreen || isPurple ? opacity : 0.5 }} />;
                 })}
               </div>
-
-              <div
-                className={`flex gap-4 text-[11px] font-bold tracking-wider uppercase mt-auto ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}
-              >
-                <span className="flex items-center gap-1 text-yellow-500">
-                  <i className="ri-star-fill"></i> 120+ Stars
-                </span>
-                <span className="flex items-center gap-1 text-green-500">
-                  <i className="ri-git-commit-fill"></i> 450+ Commits
-                </span>
+              <div className={`flex gap-4 text-[11px] font-bold tracking-wider uppercase mt-auto ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}>
+                <span className="flex items-center gap-1 text-yellow-500"><i className="ri-star-fill"></i> 120+ Stars</span>
+                <span className="flex items-center gap-1 text-green-500"><i className="ri-git-commit-fill"></i> 450+ Commits</span>
               </div>
             </div>
 
-            {/* Letterboxd / Movies */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-7 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5 hover:border-orange-500/30"
-                  : "bg-white border-black/5 hover:border-orange-500/30"
-              }`}
-            >
+            {/* Letterboxd */}
+            <div className={`col-span-1 md:col-span-12 lg:col-span-7 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-orange-500/30" : "bg-white border-black/5 hover:border-orange-500/30"}`}>
               <div className="flex justify-between items-center mb-6">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">
-                  IDK JUST PUT IT THERE
-                </span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">IDK JUST PUT IT THERE</span>
                 <div className="flex gap-1 items-center">
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-                  <span className="ml-1 text-xs font-bold tracking-wider">
-                    Letterboxd
-                  </span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span><span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span><span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                  <span className="ml-1 text-xs font-bold tracking-wider">Letterboxd</span>
                 </div>
               </div>
-
               <div className="grid grid-cols-4 gap-3 md:gap-4 mt-auto">
-                {[
-                  "https://image.tmdb.org/t/p/original/n0ybibhJtQ5icDqTp8eRytcIH84.jpg",
-                  "https://image.tmdb.org/t/p/original/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-                  "https://image.tmdb.org/t/p/original/8Z8dptEXEN3XGptcwEUjvjdZmdh.jpg",
-                  "https://image.tmdb.org/t/p/original/7vhzht5qWz4e5rO02Wb5F5rV0vG.jpg",
-                ].map((poster, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/10 group/poster"
-                  >
-                    <img
-                      src={poster}
-                      alt="Movie Poster"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-110"
-                    />
+                {["https://image.tmdb.org/t/p/original/n0ybibhJtQ5icDqTp8eRytcIH84.jpg", "https://image.tmdb.org/t/p/original/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg", "https://image.tmdb.org/t/p/original/8Z8dptEXEN3XGptcwEUjvjdZmdh.jpg", "https://image.tmdb.org/t/p/original/7vhzht5qWz4e5rO02Wb5F5rV0vG.jpg"].map((poster, i) => (
+                  <div key={i} className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/10 group/poster">
+                    <img src={poster} alt="Movie Poster" className="w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Agency / Stackup */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-5 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5 hover:border-blue-500/50"
-                  : "bg-white border-black/5 hover:border-blue-500/50"
-              }`}
-            >
+            {/* Agency */}
+            <div className={`col-span-1 md:col-span-12 lg:col-span-5 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group cursor-pointer transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-blue-500/50" : "bg-white border-black/5 hover:border-blue-500/50"}`}>
               <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none transition-opacity opacity-0 group-hover:opacity-100"></div>
-
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest uppercase">
-                  <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                    <i className="ri-building-4-line"></i>
-                  </div>
-                  Explore My Agency
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white"><i className="ri-building-4-line"></i></div> Explore My Agency
                 </div>
                 <i className="ri-arrow-right-up-line text-xl opacity-50 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"></i>
               </div>
-
               <div className="mt-auto">
-                <h3 className="text-3xl font-black tracking-tight mb-2">
-                  Stackup.id
-                </h3>
-                <p
-                  className={`text-sm mb-8 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                >
-                  Build Your Next-Gen Digital Infrastructure with us.
-                </p>
-                <span className="text-xs font-bold tracking-widest uppercase text-blue-500 flex items-center gap-2">
-                  Visit Website <i className="ri-arrow-right-line"></i>
-                </span>
+                <h3 className="text-3xl font-black tracking-tight mb-2">Stackup.id</h3>
+                <p className={`text-sm mb-8 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>Build Your Next-Gen Digital Infrastructure with us.</p>
+                <span className="text-xs font-bold tracking-widest uppercase text-blue-500 flex items-center gap-2">Visit Website <i className="ri-arrow-right-line"></i></span>
               </div>
             </div>
 
             {/* Learning */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5"
-                  : "bg-white border-black/5"
-              }`}
-            >
+            <div className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5" : "bg-white border-black/5"}`}>
               <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-6">
                 <i className="ri-compass-3-line text-lg"></i> Currently Learning
               </div>
-
-              <h3 className="text-2xl font-black tracking-tight mb-2">
-                Tech Exploration
-              </h3>
-              <p
-                className={`text-sm mb-8 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                Focusing on expanding boundaries in Web Development and AI
-                Engineering.
-              </p>
-
+              <h3 className="text-2xl font-black tracking-tight mb-2">Tech Exploration</h3>
+              <p className={`text-sm mb-8 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>Focusing on expanding boundaries in Web Development and AI Engineering.</p>
               <div className="flex flex-wrap gap-2 mt-auto">
-                {["Golang", "Hardware Hacking", "Rust", "Three.js"].map(
-                  (tech, i) => (
-                    <span
-                      key={i}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide border transition-colors ${
-                        isDarkTheme
-                          ? "bg-white/[0.02] border-white/10 hover:bg-white/10"
-                          : "bg-black/[0.02] border-black/10 hover:bg-black/5"
-                      }`}
-                    >
-                      {tech}
-                    </span>
-                  ),
-                )}
+                {["Golang", "Hardware Hacking", "Rust", "Three.js"].map((tech, i) => (
+                  <span key={i} className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide border transition-colors ${isDarkTheme ? "bg-white/[0.02] border-white/10 hover:bg-white/10" : "bg-black/[0.02] border-black/10 hover:bg-black/5"}`}>{tech}</span>
+                ))}
               </div>
             </div>
 
             {/* Current Project */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${
-                isDarkTheme
-                  ? "bg-[#0a0a0a]/80 border-white/5"
-                  : "bg-white border-black/5"
-              }`}
-            >
+            <div className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5" : "bg-white border-black/5"}`}>
               <div className="absolute top-8 right-8">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                 </span>
               </div>
-
               <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-6">
                 <i className="ri-code-s-slash-line text-lg"></i> Current Project
               </div>
-
-              <h3 className="text-2xl font-black tracking-tight mb-1">
-                The Neighbor's Voice
-              </h3>
-              <p
-                className={`text-xs italic mb-5 ${isDarkTheme ? "text-blue-400" : "text-blue-600"}`}
-              >
-                "How long will you stay silent"
-              </p>
-
-              <p
-                className={`text-sm leading-relaxed mt-auto ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                Pengembangan <em>game</em> psikologis misteri dengan Godot
-                Engine. Berfokus pada penceritaan bercabang dan narasi moral
-                yang gelap.
-              </p>
+              <h3 className="text-2xl font-black tracking-tight mb-1">The Neighbor's Voice</h3>
+              <p className={`text-xs italic mb-5 ${isDarkTheme ? "text-blue-400" : "text-blue-600"}`}>"How long will you stay silent"</p>
+              <p className={`text-sm leading-relaxed mt-auto ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>Pengembangan <em>game</em> psikologis misteri dengan Godot Engine. Berfokus pada penceritaan bercabang dan narasi moral yang gelap.</p>
             </div>
           </div>
         </section>
 
-        {/* 5. TOOLS SECTION */}
-        <section
-          id="tools"
-          className={`py-24 border-t relative ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-        >
+        {/* --- 5. TOOLS SECTION --- */}
+        <section id="tools" className={`py-24 border-t relative ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 rounded-full blur-[150px] pointer-events-none z-0 opacity-30 bg-zinc-500/20"></div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-            }}
-            className="relative z-10"
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="relative z-10">
             <div className="text-center mb-16">
-              <motion.h2
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-                }}
-                className="text-4xl md:text-5xl font-black mb-4 tracking-tight"
-              >
-                {t("toolsTitle")}
-              </motion.h2>
-              <motion.p
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-                }}
-                className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                {t("toolsDesc")}
-              </motion.p>
+              <motion.h2 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }} className="text-4xl md:text-5xl font-black mb-4 tracking-tight">{t("toolsTitle")}</motion.h2>
+              <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }} className={`text-base md:text-lg ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>{t("toolsDesc")}</motion.p>
             </div>
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { duration: 0.8 } },
-              }}
-            >
+            <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.8 } } }}>
               <InfiniteMarquee />
             </motion.div>
-
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-16">
               {listTools.map((tool) => (
-                <motion.div
-                  key={tool.id}
-                  variants={{
-                    hidden: { opacity: 0, y: 30, scale: 0.9 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      scale: 1,
-                      transition: {
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 15,
-                      },
-                    },
-                  }}
-                  whileHover={{ y: -8, scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`group relative p-6 rounded-3xl border flex flex-col items-center justify-center gap-5 overflow-hidden backdrop-blur-sm cursor-pointer ${
-                    isDarkTheme
-                      ? "bg-[#111111]/80 border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
-                      : "bg-white/80 border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
-                  }`}
-                >
-                  <div
-                    className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                      isDarkTheme
-                        ? "bg-gradient-to-b from-white/10 to-transparent"
-                        : "bg-gradient-to-b from-black/5 to-transparent"
-                    }`}
-                  />
-
-                  <motion.img
-                    src={tool.gambar}
-                    alt={tool.nama}
-                    className="w-12 h-12 object-contain relative z-10 drop-shadow-lg"
-                    whileHover={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                  />
-                  <h4 className="font-bold text-sm tracking-wide relative z-10">
-                    {tool.nama}
-                  </h4>
+                <motion.div key={tool.id} variants={{ hidden: { opacity: 0, y: 30, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 15 } } }} whileHover={{ y: -8, scale: 1.05 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className={`group relative p-6 rounded-3xl border flex flex-col items-center justify-center gap-5 overflow-hidden backdrop-blur-sm cursor-pointer ${isDarkTheme ? "bg-[#111111]/80 border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.5)]" : "bg-white/80 border-black/5 shadow-[0_8px_30px_rgba(0,0,0,0.05)]"}`}>
+                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isDarkTheme ? "bg-gradient-to-b from-white/10 to-transparent" : "bg-gradient-to-b from-black/5 to-transparent"}`} />
+                  <motion.img src={tool.gambar} alt={tool.nama} className="w-12 h-12 object-contain relative z-10 drop-shadow-lg" whileHover={{ rotate: [0, -10, 10, -10, 10, 0] }} transition={{ duration: 0.5, ease: "easeInOut" }} />
+                  <h4 className="font-bold text-sm tracking-wide relative z-10">{tool.nama}</h4>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         </section>
 
-        {/* ========================================= */}
-        {/* 6. PROJECTS SECTION (INTERAKTIF SCROLL HORIZONTAL) */}
-        {/* ========================================= */}
-        <section
-          id="projects"
-          className={`py-24 border-t relative overflow-hidden ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-        >
-          {/* Latar Belakang Dekoratif */}
+        {/* --- 6. PROJECTS SECTION (INTERAKTIF SCROLL HORIZONTAL) --- */}
+        <section id="projects" className={`py-24 border-t relative overflow-hidden ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
           <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[150px] opacity-20 pointer-events-none bg-blue-500/10"></div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
-            }}
-            className="relative z-10"
-          >
-            {/* Header Section dengan Tombol Navigasi Panah Kiri/Kanan */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.15 } } }} className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 px-6 md:px-0">
               <div className="text-center md:text-left">
-                <motion.h2
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  className="text-4xl md:text-5xl font-black mb-4 tracking-tight"
-                >
-                  Proyek Pilihan
-                </motion.h2>
-                <motion.p
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  className={`text-base md:text-lg max-w-xl ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                >
-                  Kumpulan karya terbaik saya dalam membangun pengalaman
-                  digital. Geser untuk menjelajahi lebih banyak proyek.
+                <motion.h2 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Proyek Pilihan</motion.h2>
+                <motion.p variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className={`text-base md:text-lg max-w-xl ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                  Kumpulan karya terbaik saya dalam membangun pengalaman digital. Geser untuk menjelajahi lebih banyak proyek.
                 </motion.p>
               </div>
-
-              {/* Tombol Panah Kanan Kiri (Tampil di Desktop) */}
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0, x: 20 },
-                  visible: { opacity: 1, x: 0 },
-                }}
-                className="hidden md:flex items-center gap-3"
-              >
-                <button
-                  onClick={() => scrollCarousel("left")}
-                  className={`w-12 h-12 flex items-center justify-center rounded-full border transition-all hover:-translate-x-1 hover:scale-105 active:scale-95 ${
-                    isDarkTheme
-                      ? "border-white/20 bg-white/5 text-white hover:bg-white/10"
-                      : "border-black/20 bg-black/5 text-black hover:bg-black/10"
-                  }`}
-                >
+              <motion.div variants={{ hidden: { opacity: 0, x: 20 }, visible: { opacity: 1, x: 0 } }} className="hidden md:flex items-center gap-3">
+                <button onClick={() => scrollCarousel("left")} className={`w-12 h-12 flex items-center justify-center rounded-full border transition-all hover:-translate-x-1 hover:scale-105 active:scale-95 ${isDarkTheme ? "border-white/20 bg-white/5 text-white hover:bg-white/10" : "border-black/20 bg-black/5 text-black hover:bg-black/10"}`}>
                   <i className="ri-arrow-left-s-line text-2xl"></i>
                 </button>
-                <button
-                  onClick={() => scrollCarousel("right")}
-                  className={`w-12 h-12 flex items-center justify-center rounded-full border transition-all hover:translate-x-1 hover:scale-105 active:scale-95 ${
-                    isDarkTheme
-                      ? "border-white/20 bg-white/5 text-white hover:bg-white/10"
-                      : "border-black/20 bg-black/5 text-black hover:bg-black/10"
-                  }`}
-                >
+                <button onClick={() => scrollCarousel("right")} className={`w-12 h-12 flex items-center justify-center rounded-full border transition-all hover:translate-x-1 hover:scale-105 active:scale-95 ${isDarkTheme ? "border-white/20 bg-white/5 text-white hover:bg-white/10" : "border-black/20 bg-black/5 text-black hover:bg-black/10"}`}>
                   <i className="ri-arrow-right-s-line text-2xl"></i>
                 </button>
               </motion.div>
             </div>
 
-            {/* Container Slider Horizontal (Native CSS Snap Scroll - Tanpa Scrollbar) */}
             <div className="relative w-full">
-              {/* Menyembunyikan scrollbar bawaan menggunakan trik Tailwind */}
-              <div
-                ref={carouselRef}
-                className="flex overflow-x-auto gap-6 pb-12 pt-4 px-6 md:px-0 snap-x snap-mandatory cursor-grab active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none]"
-              >
+              <div ref={carouselRef} className="flex overflow-x-auto gap-6 pb-12 pt-4 px-6 md:px-0 snap-x snap-mandatory cursor-grab active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none]">
                 {listProyek.map((proyek) => (
-                  <motion.div
-                    key={proyek.id}
-                    variants={{
-                      hidden: { opacity: 0, x: 40 },
-                      visible: {
-                        opacity: 1,
-                        x: 0,
-                        transition: {
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 15,
-                        },
-                      },
-                    }}
-                    whileHover={{ y: -8 }}
-                    // Lebar Kartu Responsif: Mobile 85vw, Tablet 45vw, Desktop Fix 400px
-                    className={`shrink-0 snap-center w-[85vw] md:w-[45vw] lg:w-[400px] group flex flex-col p-5 md:p-6 rounded-[2.5rem] border transition-all duration-500 ${
-                      isDarkTheme
-                        ? "bg-[#0a0a0a] border-white/5 hover:border-white/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
-                        : "bg-white border-black/5 hover:border-black/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)]"
-                    }`}
-                  >
-                    {/* Container Gambar (Rounded di dalam card) */}
+                  <motion.div key={proyek.id} variants={{ hidden: { opacity: 0, x: 40 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 100, damping: 15 } } }} whileHover={{ y: -8 }} className={`shrink-0 snap-center w-[85vw] md:w-[45vw] lg:w-[400px] group flex flex-col p-5 md:p-6 rounded-[2.5rem] border transition-all duration-500 ${isDarkTheme ? "bg-[#0a0a0a] border-white/5 hover:border-white/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)]" : "bg-white border-black/5 hover:border-black/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)]"}`}>
                     <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-zinc-800 mb-6 border border-white/5">
-                      <img
-                        src={proyek.gambar}
-                        alt={proyek.nama}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        draggable="false" // Mencegah gambar ikut terseret saat di-swipe
-                      />
+                      <img src={proyek.gambar} alt={proyek.nama} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" draggable="false" />
                       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     </div>
-
-                    {/* Konten Teks */}
                     <div className="flex flex-col flex-grow px-2">
-                      <h3 className="text-2xl font-bold tracking-tight mb-3 group-hover:text-blue-400 transition-colors duration-300">
-                        {proyek.nama}
-                      </h3>
-
-                      <p
-                        className={`text-sm leading-relaxed mb-4 line-clamp-3 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-                      >
-                        {proyek.desk}
-                      </p>
-
-                      <div
-                        className={`text-[10px] font-bold tracking-widest uppercase mb-8 flex items-center gap-1 transition-colors cursor-pointer ${
-                          isDarkTheme
-                            ? "text-zinc-500 group-hover:text-white"
-                            : "text-zinc-400 group-hover:text-black"
-                        }`}
-                      >
+                      <h3 className="text-2xl font-bold tracking-tight mb-3 group-hover:text-blue-400 transition-colors duration-300">{proyek.nama}</h3>
+                      <p className={`text-sm leading-relaxed mb-4 line-clamp-3 ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>{proyek.desk}</p>
+                      <div className={`text-[10px] font-bold tracking-widest uppercase mb-8 flex items-center gap-1 transition-colors cursor-pointer ${isDarkTheme ? "text-zinc-500 group-hover:text-white" : "text-zinc-400 group-hover:text-black"}`}>
                         READ MORE <i className="ri-arrow-down-s-line"></i>
                       </div>
-
-                      {/* Footer Kartu (Tools Stack & Tombol Preview) */}
-                      <div
-                        className={`mt-auto flex items-center justify-between pt-6 border-t ${isDarkTheme ? "border-white/5" : "border-black/5"}`}
-                      >
-                        {/* Tools Stack (Ikon saling tumpuk) */}
+                      <div className={`mt-auto flex items-center justify-between pt-6 border-t ${isDarkTheme ? "border-white/5" : "border-black/5"}`}>
                         <div className="flex items-center -space-x-3">
                           {proyek.tools.slice(0, 4).map((tool, i) => (
-                            <div
-                              key={i}
-                              title={tool}
-                              className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-bold z-${40 - i * 10} transition-transform hover:-translate-y-2 hover:z-50 ${
-                                isDarkTheme
-                                  ? "bg-zinc-900 border-[#0a0a0a] text-white"
-                                  : "bg-zinc-100 border-white text-black"
-                              }`}
-                            >
+                            <div key={i} title={tool} className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-bold z-${40 - i * 10} transition-transform hover:-translate-y-2 hover:z-50 ${isDarkTheme ? "bg-zinc-900 border-[#0a0a0a] text-white" : "bg-zinc-100 border-white text-black"}`}>
                               {tool.substring(0, 2)}
                             </div>
                           ))}
                           {proyek.tools.length > 4 && (
-                            <div
-                              className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-bold z-0 ${
-                                isDarkTheme
-                                  ? "bg-zinc-800 border-[#0a0a0a] text-zinc-400"
-                                  : "bg-zinc-200 border-white text-zinc-600"
-                              }`}
-                            >
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-bold z-0 ${isDarkTheme ? "bg-zinc-800 border-[#0a0a0a] text-zinc-400" : "bg-zinc-200 border-white text-zinc-600"}`}>
                               +{proyek.tools.length - 4}
                             </div>
                           )}
                         </div>
-
-                        {/* Preview Button */}
-                        <a
-                          href="#"
-                          className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold tracking-widest uppercase border transition-all hover:scale-105 ${
-                            isDarkTheme
-                              ? "bg-white/5 border-white/10 hover:bg-white text-white hover:text-black"
-                              : "bg-black/5 border-black/10 hover:bg-black text-black hover:text-white"
-                          }`}
-                        >
+                        <a href="#" className={`flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold tracking-widest uppercase border transition-all hover:scale-105 ${isDarkTheme ? "bg-white/5 border-white/10 hover:bg-white text-white hover:text-black" : "bg-black/5 border-black/10 hover:bg-black text-black hover:text-white"}`}>
                           Preview <i className="ri-external-link-line"></i>
                         </a>
                       </div>
@@ -1107,133 +552,44 @@ function App() {
                 ))}
               </div>
             </div>
-
-            {/* Indikator Swipe (Khusus Mobile) */}
             <div className="flex items-center justify-center gap-2 mt-2 md:hidden text-xs font-bold tracking-widest uppercase text-zinc-500">
-              <i className="ri-arrow-left-line animate-pulse"></i> Geser{" "}
-              <i className="ri-arrow-right-line animate-pulse"></i>
+              <i className="ri-arrow-left-line animate-pulse"></i> Geser <i className="ri-arrow-right-line animate-pulse"></i>
             </div>
           </motion.div>
         </section>
-        {/* ========================================= */}
 
-        {/* ========================================= */}
-        {/* 7. CONTACT SECTION (Modern & Interaktif)  */}
-        {/* ========================================= */}
+        {/* --- 7. CONTACT SECTION --- */}
         <section id="contact" className="py-32 relative overflow-hidden">
-          {/* Garis Pembatas Gradient Halus */}
-          <div
-            className={`absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px ${isDarkTheme ? "bg-gradient-to-r from-transparent via-white/20 to-transparent" : "bg-gradient-to-r from-transparent via-black/20 to-transparent"}`}
-          ></div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={stagger}
-            className={`w-full max-w-5xl mx-auto rounded-[3rem] p-10 md:p-20 text-center border relative overflow-hidden shadow-2xl ${
-              isDarkTheme
-                ? "bg-[#0a0a0a]/80 border-white/10 backdrop-blur-2xl"
-                : "bg-white/80 border-black/10 backdrop-blur-2xl"
-            }`}
-          >
-            {/* --- Animated Ambient Glow Background --- */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-              className={`absolute -top-32 -left-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-blue-600/20" : "bg-blue-400/20"}`}
-            />
-            <motion.div
-              animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className={`absolute -bottom-32 -right-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-purple-600/20" : "bg-purple-400/20"}`}
-            />
+          <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px ${isDarkTheme ? "bg-gradient-to-r from-transparent via-white/20 to-transparent" : "bg-gradient-to-r from-transparent via-black/20 to-transparent"}`}></div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className={`w-full max-w-5xl mx-auto rounded-[3rem] p-10 md:p-20 text-center border relative overflow-hidden shadow-2xl ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/10 backdrop-blur-2xl" : "bg-white/80 border-black/10 backdrop-blur-2xl"}`}>
+            <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className={`absolute -top-32 -left-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-blue-600/20" : "bg-blue-400/20"}`} />
+            <motion.div animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className={`absolute -bottom-32 -right-32 w-96 h-96 blur-[120px] pointer-events-none ${isDarkTheme ? "bg-purple-600/20" : "bg-purple-400/20"}`} />
 
             <div className="relative z-10 flex flex-col items-center">
-              {/* Badge Status */}
-              <motion.div
-                variants={fadeUp}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase border mb-8 ${
-                  isDarkTheme
-                    ? "bg-white/5 border-white/10 text-white"
-                    : "bg-black/5 border-black/10 text-black"
-                }`}
-              >
+              <motion.div variants={fadeUp} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase border mb-8 ${isDarkTheme ? "bg-white/5 border-white/10 text-white" : "bg-black/5 border-black/10 text-black"}`}>
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
                 Status: Open to Work
               </motion.div>
-
-              <motion.h2
-                variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6"
-              >
+              <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
                 {t("contactTitle") || "Mari Berkolaborasi."}
               </motion.h2>
-
-              <motion.p
-                variants={fadeUp}
-                className={`text-base md:text-lg mb-12 max-w-xl leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}
-              >
-                Mari diskusikan proyek web Anda selanjutnya. Saya siap membantu
-                mewujudkan ide kompleks menjadi aplikasi berkinerja tinggi.
+              <motion.p variants={fadeUp} className={`text-base md:text-lg mb-12 max-w-xl leading-relaxed ${isDarkTheme ? "text-zinc-400" : "text-zinc-600"}`}>
+                Mari diskusikan proyek web Anda selanjutnya. Saya siap membantu mewujudkan ide kompleks menjadi aplikasi berkinerja tinggi.
               </motion.p>
-
-              {/* Grup Tombol Interaktif */}
-              <motion.div
-                variants={fadeUp}
-                className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
-              >
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="mailto:emailanda@gmail.com"
-                  className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold transition-all ${
-                    isDarkTheme
-                      ? "bg-white text-black hover:bg-zinc-200"
-                      : "bg-black text-white hover:bg-zinc-800"
-                  }`}
-                >
-                  Mulai Diskusi{" "}
-                  <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+                <motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="mailto:emailanda@gmail.com" className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold transition-all ${isDarkTheme ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"}`}>
+                  Mulai Diskusi <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                 </motion.a>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() =>
-                    navigator.clipboard.writeText("emailanda@gmail.com")
-                  }
-                  className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold border transition-all ${
-                    isDarkTheme
-                      ? "border-white/20 text-white hover:bg-white/10"
-                      : "border-black/20 text-black hover:bg-black/5"
-                  }`}
-                >
-                  <i className="ri-file-copy-line text-lg group-hover:scale-110 transition-transform"></i>{" "}
-                  Copy Email
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigator.clipboard.writeText("emailanda@gmail.com")} className={`group flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-full font-bold border transition-all ${isDarkTheme ? "border-white/20 text-white hover:bg-white/10" : "border-black/20 text-black hover:bg-black/5"}`}>
+                  <i className="ri-file-copy-line text-lg group-hover:scale-110 transition-transform"></i> Copy Email
                 </motion.button>
               </motion.div>
-
-              {/* Ikon Sosial Media Interaktif */}
-              <motion.div
-                variants={fadeUp}
-                className={`flex justify-center gap-8 mt-16 pt-8 border-t w-full max-w-md ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
-              >
-                {[
-                  "github-fill",
-                  "linkedin-fill",
-                  "instagram-line",
-                  "twitter-x-line",
-                ].map((icon, i) => (
-                  <motion.a
-                    key={i}
-                    href="#"
-                    whileHover={{ y: -5, scale: 1.1 }}
-                    className={`text-2xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-400 hover:text-black"}`}
-                  >
+              <motion.div variants={fadeUp} className={`flex justify-center gap-8 mt-16 pt-8 border-t w-full max-w-md ${isDarkTheme ? "border-white/10" : "border-black/10"}`}>
+                {["github-fill", "linkedin-fill", "instagram-line", "twitter-x-line"].map((icon, i) => (
+                  <motion.a key={i} href="#" whileHover={{ y: -5, scale: 1.1 }} className={`text-2xl transition-colors duration-300 ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-400 hover:text-black"}`}>
                     <i className={`ri-${icon}`}></i>
                   </motion.a>
                 ))}
@@ -1241,50 +597,33 @@ function App() {
             </div>
           </motion.div>
         </section>
-      </div>{" "}
-      {/* <-- Penutup div .relative.z-20.max-w-7xl */}
-      {/* ========================================= */}
-      {/* FOOTER SECTION (Modern Flex-Between)      */}
-      {/* ========================================= */}
-      <footer
-        className={`py-8 md:py-10 border-t relative z-20 ${isDarkTheme ? "border-white/10 bg-black" : "border-black/10 bg-[#f5f5f5]"}`}
-      >
+
+      </div> 
+      {/* <-- End of main container --> */}
+
+      {/* --- 8. FOOTER SECTION --- */}
+      <footer className={`py-8 md:py-10 border-t relative z-20 ${isDarkTheme ? "border-white/10 bg-black" : "border-black/10 bg-[#f5f5f5]"}`}>
         <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Kiri: Logo Mini */}
           <div className="flex items-center gap-3">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm ${isDarkTheme ? "bg-white text-black" : "bg-black text-white"}`}
-            >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm ${isDarkTheme ? "bg-white text-black" : "bg-black text-white"}`}>
               I
             </div>
-            <span className="text-sm font-bold tracking-widest uppercase">
-              IQBAL.
-            </span>
+            <span className="text-sm font-bold tracking-widest uppercase">IQBAL.</span>
           </div>
-
-          {/* Tengah: Copyright */}
-          <p
-            className={`text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}
-          >
-            &copy; {new Date().getFullYear()} • Dibuat dengan{" "}
-            <i className="ri-heart-3-fill text-red-500 mx-0.5 text-xs"></i> &
-            React
+          <p className={`text-[10px] md:text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 ${isDarkTheme ? "text-zinc-500" : "text-zinc-500"}`}>
+            &copy; {new Date().getFullYear()} • Dibuat dengan <i className="ri-heart-3-fill text-red-500 mx-0.5 text-xs"></i> & React
           </p>
-
-          {/* Kanan: Back to Top */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className={`group flex items-center gap-2 text-[10px] md:text-[11px] font-bold tracking-widest uppercase transition-colors ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black"}`}
-          >
-            Kembali ke atas{" "}
-            <i className="ri-arrow-up-line text-sm group-hover:-translate-y-1 transition-transform"></i>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className={`group flex items-center gap-2 text-[10px] md:text-[11px] font-bold tracking-widest uppercase transition-colors ${isDarkTheme ? "text-zinc-500 hover:text-white" : "text-zinc-500 hover:text-black"}`}>
+            Kembali ke atas <i className="ri-arrow-up-line text-sm group-hover:-translate-y-1 transition-transform"></i>
           </button>
         </div>
       </footer>
-      {/* Komponen Spotify - Tampil di semua device */}
+
+      {/* --- 9. FLOATING COMPONENT (Spotify) --- */}
       <div className="fixed bottom-8 right-8 z-[110] md:block">
         <SpotifyNowPlaying />
       </div>
+
     </div>
   );
 }
