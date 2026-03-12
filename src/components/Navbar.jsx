@@ -152,17 +152,28 @@ const Navbar = () => {
         >
           <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 py-4 flex items-center justify-between">
             
-            {/* Bagian Kiri: Logo Bersih */}
+            {/* Bagian Kiri: Logo Gambar Besar & Teks Bersih */}
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="logo cursor-pointer shrink-0" 
+              className="logo cursor-pointer shrink-0 flex items-center gap-3 md:gap-5 group" 
               onClick={() => scrollToSection("hero")}
             >
+              {/* Tempat Logo - Ukuran aslinya tetap kecil agar navbar tidak bengkak */}
+              <div className="w-10 h-10 flex items-center justify-center relative">
+                {/* Visual logonya yang diperbesar dengan scale */}
+                <img 
+                  src="/assets/logo.png" 
+                  alt="Iqbal Logo" 
+                  className="absolute w-full h-full object-contain transition-transform duration-500 group-hover:rotate-12 scale-[1.8] md:scale-[2.2]"
+                />
+              </div>
+              
+              {/* Teks IQBAL */}
               <h1 className={`text-2xl md:text-3xl font-black tracking-tighter transition-colors ${
                 isDarkTheme ? "text-white" : "text-black"
               }`}>
-                IQBAL<span className={isDarkTheme ? "text-zinc-500" : "text-zinc-400"}>.</span>
+                baal<span className={isDarkTheme ? "text-zinc-500" : "text-zinc-400"}></span>
               </h1>
             </motion.div>
 
@@ -283,7 +294,8 @@ const Navbar = () => {
                   >
                     <span className={`text-base font-semibold transition-colors ${
                       isDarkTheme ? "text-zinc-300 group-hover:text-white" : "text-zinc-600 group-hover:text-black"
-                    }`}>
+                    }`}
+                    >
                       {item.label}
                     </span>
                     <i className={`ri-arrow-right-s-line text-xl transition-colors ${
