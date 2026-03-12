@@ -14,10 +14,8 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
       <LanguageProvider>
-        <div className="container mx-auto px-4">
-          <Navbar />
-          <App />
-        </div>
+        <Navbar />
+        <App />
       </LanguageProvider>
     </ThemeProvider>
   </StrictMode>,
