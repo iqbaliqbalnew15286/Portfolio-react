@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { listTools, listProyek } from "./data";
-const HeroImage = "/assets/hero-img.webp";
+const HeroImage = "/assets/hero-img.webp"; // Gambar ini masih dipakai untuk section About
 import { useLanguage } from "./components/LanguageContext";
 import { useTheme } from "./components/ThemeContext";
 
@@ -10,6 +10,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import SpotifyNowPlaying from "./components/SpotifyNowPlaying";
 import InfiniteMarquee from "./components/InfiniteMarquee";
 import EmojiReactions from "./components/EmojiReactions";
+import Robot3D from "./components/Robot3D"; // <-- Import Komponen Robot 3D
 
 // =========================================================================
 // KOMPONEN JAM DIGITAL (Dipindah ke atas / Hero Section)
@@ -207,6 +208,7 @@ function App() {
       </div>
 
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-8">
+        
         {/* --- 1. HERO SECTION --- */}
         <section
           id="hero"
@@ -243,6 +245,7 @@ function App() {
               </motion.p>
             </motion.div>
 
+            {/* AREA ROBOT 3D (Menggantikan Gambar Hero) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -251,29 +254,26 @@ function App() {
                 delay: 0.2,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2"
+              className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2 w-full"
             >
               <motion.div
-                animate={{ y: [-10, 10, -10] }}
+                animate={{ y: [-5, 5, -5] }} // Efek melayang halus (floating)
                 transition={{
                   repeat: Infinity,
                   duration: 6,
                   ease: "easeInOut",
                 }}
-                className="relative w-full max-w-[280px] sm:max-w-[350px] lg:max-w-[400px] aspect-[3/4] will-change-transform"
+                className="relative w-full h-[350px] sm:h-[400px] lg:h-[500px] will-change-transform z-10"
               >
-                <img
-                  src={HeroImage}
-                  alt="Hero Object"
-                  className="w-full h-full object-contain drop-shadow-2xl"
-                />
+                {/* PEMANGGILAN KOMPONEN ROBOT 3D DARI R3F */}
+                <Robot3D />
               </motion.div>
             </motion.div>
+
           </div>
         </section>
 
         {/* --- 2. PROFILE SECTION --- */}
-        {/* Ditambahkan scroll-mt-28 agar saat di-klik dari menu tidak tertutup navbar */}
         <section
           id="about"
           className={`py-24 border-t scroll-mt-28 ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
@@ -637,7 +637,7 @@ function App() {
               </div>
             </div>
 
-           {/* Github (Animasi Hidup Kembali & Bisa Diklik) */}
+            {/* Github (Animasi Hidup Kembali & Bisa Diklik) */}
             <a
               href="https://github.com/username-github-anda" /* <-- GANTI DENGAN LINK GITHUB ASLI ANDA DI SINI */
               target="_blank"
@@ -686,10 +686,10 @@ function App() {
                         isPurple
                           ? "bg-violet-500"
                           : isGreen
-                          ? "bg-green-500"
-                          : isDarkTheme
-                          ? "bg-zinc-800"
-                          : "bg-zinc-300"
+                            ? "bg-green-500"
+                            : isDarkTheme
+                              ? "bg-zinc-800"
+                              : "bg-zinc-300"
                       }`}
                     />
                   );
@@ -1100,12 +1100,15 @@ function App() {
         </section>
 
         {/* ========================================= */}
-        {/* 7. CONTACT SECTION (Modern 2-Column Split)  */}
+        {/* 7. CONTACT SECTION (Modern 2-Column Split)  */}
         {/* ========================================= */}
         <section
           id="contact"
           className={`py-32 relative overflow-hidden border-t scroll-mt-28 ${isDarkTheme ? "border-white/10" : "border-black/10"}`}
         >
+          {/* Menghapus rotasi/blur berlebih agar lebih ringan di GPU */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] opacity-10 pointer-events-none bg-blue-500"></div>
+
           <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
               {/* KOLOM KIRI: Teks & Info Kontak Cepat */}
@@ -1149,6 +1152,7 @@ function App() {
                   </motion.p>
                 </div>
 
+                {/* List Kontak Cepat dengan Efek Menyala saat Hover */}
                 <motion.div
                   variants={fadeUp}
                   className="flex flex-col gap-6 mt-4"
@@ -1211,6 +1215,7 @@ function App() {
                 <div
                   className={`w-full p-8 md:p-10 rounded-[2.5rem] border shadow-2xl relative ${isDarkTheme ? "bg-[#0a0a0a] border-white/10" : "bg-white border-black/10"}`}
                 >
+                  {/* Toggles Tipe Pesan */}
                   <div
                     className={`flex p-1.5 rounded-2xl mb-8 ${isDarkTheme ? "bg-[#111] border border-white/5" : "bg-zinc-100 border border-black/5"}`}
                   >
@@ -1228,6 +1233,7 @@ function App() {
                     </button>
                   </div>
 
+                  {/* Form Input */}
                   <form
                     className="flex flex-col gap-6"
                     onSubmit={
@@ -1374,7 +1380,7 @@ function App() {
       {/* <-- End of main container --> */}
 
       {/* ========================================= */}
-      {/* 8. FOOTER SECTION (Mega Modern Layout)      */}
+      {/* 8. FOOTER SECTION (Mega Modern Layout)      */}
       {/* ========================================= */}
       <footer
         className={`relative z-20 pt-24 pb-8 md:pb-12 overflow-hidden ${isDarkTheme ? "bg-[#050505]" : "bg-zinc-100"}`}
@@ -1460,7 +1466,7 @@ function App() {
       </footer>
 
       {/* --- 9. FLOATING COMPONENT (Spotify) --- */}
-      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[110] flex">
+      <div className="fixed bottom-8 right-8 z-[110] hidden xl:block">
         <SpotifyNowPlaying />
       </div>
     </div>
