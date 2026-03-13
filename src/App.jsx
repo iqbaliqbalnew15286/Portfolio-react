@@ -637,14 +637,22 @@ function App() {
               </div>
             </div>
 
-            {/* Github (Animasi Hidup Kembali) */}
-            <div
-              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 ${isDarkTheme ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20" : "bg-white border-black/5 hover:border-black/20"}`}
+           {/* Github (Animasi Hidup Kembali & Bisa Diklik) */}
+            <a
+              href="https://github.com/username-github-anda" /* <-- GANTI DENGAN LINK GITHUB ASLI ANDA DI SINI */
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`col-span-1 md:col-span-12 lg:col-span-6 relative overflow-hidden p-6 md:p-8 rounded-[2rem] border flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1 block cursor-pointer ${
+                isDarkTheme
+                  ? "bg-[#0a0a0a]/80 border-white/5 hover:border-white/20"
+                  : "bg-white border-black/5 hover:border-black/20"
+              }`}
             >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase">
                   <i className="ri-github-fill text-lg"></i> GitHub
                 </div>
+                {/* Ikon panah keluar akan muncul saat di-hover */}
                 <i className="ri-external-link-line opacity-0 group-hover:opacity-100 transition-opacity"></i>
               </div>
               <div className="grid grid-cols-12 gap-1.5 opacity-80 mb-4">
@@ -678,17 +686,19 @@ function App() {
                         isPurple
                           ? "bg-violet-500"
                           : isGreen
-                            ? "bg-green-500"
-                            : isDarkTheme
-                              ? "bg-zinc-800"
-                              : "bg-zinc-300"
+                          ? "bg-green-500"
+                          : isDarkTheme
+                          ? "bg-zinc-800"
+                          : "bg-zinc-300"
                       }`}
                     />
                   );
                 })}
               </div>
               <div
-                className={`flex gap-4 text-[11px] font-bold tracking-wider uppercase mt-auto ${isDarkTheme ? "text-zinc-400" : "text-zinc-500"}`}
+                className={`flex gap-4 text-[11px] font-bold tracking-wider uppercase mt-auto ${
+                  isDarkTheme ? "text-zinc-400" : "text-zinc-500"
+                }`}
               >
                 <span className="flex items-center gap-1 text-yellow-500">
                   <i className="ri-star-fill"></i> 120+ Stars
@@ -697,7 +707,7 @@ function App() {
                   <i className="ri-git-commit-fill"></i> 450+ Commits
                 </span>
               </div>
-            </div>
+            </a>
 
             {/* Letterboxd */}
             <div
@@ -718,10 +728,10 @@ function App() {
               </div>
               <div className="grid grid-cols-4 gap-3 md:gap-4 mt-auto">
                 {[
-                  "https://image.tmdb.org/t/p/original/n0ybibhJtQ5icDqTp8eRytcIH84.jpg",
-                  "https://image.tmdb.org/t/p/original/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-                  "https://image.tmdb.org/t/p/original/8Z8dptEXEN3XGptcwEUjvjdZmdh.jpg",
-                  "https://image.tmdb.org/t/p/original/7vhzht5qWz4e5rO02Wb5F5rV0vG.jpg",
+                  "/assets/poster/poster1.jpg",
+                  "/assets/poster/poster2.jpg",
+                  "/assets/poster/poster3.jpg",
+                  "/assets/poster/poster4.jpg",
                 ].map((poster, i) => (
                   <div
                     key={i}
@@ -729,7 +739,7 @@ function App() {
                   >
                     <img
                       src={poster}
-                      alt="Movie Poster"
+                      alt={`Movie Poster ${i + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-300"></div>
